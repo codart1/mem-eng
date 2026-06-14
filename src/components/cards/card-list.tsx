@@ -15,8 +15,10 @@ import { CardDialog } from "./card-dialog";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { repository } from "@/lib/db/dexie-repository";
 import type { VocabCard } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 function CardRow({ card }: { card: VocabCard }) {
+  const t = useT();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -46,16 +48,16 @@ function CardRow({ card }: { card: VocabCard }) {
 
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={<Button variant="ghost" size="icon-sm" aria-label="Card options" />}
+          render={<Button variant="ghost" size="icon-sm" aria-label={t.cardRow.options} />}
         >
           <MoreVertical className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => setEditOpen(true)}>
-            <Pencil className="size-4" /> Edit
+            <Pencil className="size-4" /> {t.common.edit}
           </DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
-            <Trash2 className="size-4" /> Delete
+            <Trash2 className="size-4" /> {t.common.delete}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -69,12 +71,12 @@ function CardRow({ card }: { card: VocabCard }) {
       <ConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title={`Delete "${card.word}"?`}
-        confirmLabel="Delete"
+        title={t.cardRow.deleteTitle.replace("{word}", card.word)}
+        confirmLabel={t.cardRow.deleteConfirm}
         destructive
         onConfirm={async () => {
           await repository.cards.remove(card.id);
-          toast.success("Card deleted");
+          toast.success(t.cardRow.deleted);
         }}
       />
     </div>

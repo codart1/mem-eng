@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PartyPopper, RotateCcw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n";
 
 export interface SessionStats {
   reviewed: number;
@@ -27,6 +28,7 @@ export function SessionSummary({
   onRestart?: () => void;
   canRestart?: boolean;
 }) {
+  const t = useT();
   const passed = stats.reviewed - stats.again;
   const accuracy =
     stats.reviewed > 0 ? Math.round((passed / stats.reviewed) * 100) : 0;
@@ -39,25 +41,23 @@ export function SessionSummary({
             <PartyPopper className="size-8" />
           </div>
           <h2 className="mt-2 font-serif text-2xl font-semibold">
-            Session complete
+            {t.sessionSummary.complete}
           </h2>
-          <p className="text-muted-foreground text-sm">
-            Nice work — your schedule is updated.
-          </p>
+          <p className="text-muted-foreground text-sm">{t.sessionSummary.niceWork}</p>
         </div>
         <CardContent className="grid grid-cols-3 gap-3 py-6">
-          <Stat label="Reviewed" value={stats.reviewed} />
-          <Stat label="Accuracy" value={`${accuracy}%`} />
-          <Stat label="Time" value={formatDuration(stats.durationMs)} />
+          <Stat label={t.sessionSummary.reviewed} value={stats.reviewed} />
+          <Stat label={t.sessionSummary.accuracy} value={`${accuracy}%`} />
+          <Stat label={t.sessionSummary.time} value={formatDuration(stats.durationMs)} />
         </CardContent>
         <div className="flex gap-2 px-6 pb-6">
           {canRestart && onRestart && (
             <Button variant="outline" className="flex-1" onClick={onRestart}>
-              <RotateCcw className="size-4" /> Keep going
+              <RotateCcw className="size-4" /> {t.sessionSummary.keepGoing}
             </Button>
           )}
           <Button className="flex-1" render={<Link href="/dashboard" />}>
-            Done
+            {t.sessionSummary.done}
           </Button>
         </div>
       </Card>

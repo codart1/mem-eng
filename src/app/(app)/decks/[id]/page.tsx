@@ -21,8 +21,10 @@ import { CardDialog } from "@/components/cards/card-dialog";
 import { DeckDialog } from "@/components/decks/deck-dialog";
 import { useDeck, useCardsByDeck } from "@/lib/hooks/use-data";
 import { deckColor } from "@/lib/deck-color";
+import { useT } from "@/lib/i18n";
 
 export default function DeckDetailPage() {
+  const t = useT();
   const params = useParams<{ id: string }>();
   const id = params.id;
   const router = useRouter();
@@ -57,11 +59,11 @@ export default function DeckDetailPage() {
     return (
       <EmptyState
         icon={BookOpen}
-        title="Deck not found"
-        description="This deck may have been deleted."
+        title={t.deckDetail.notFoundTitle}
+        description={t.deckDetail.notFoundDescription}
         action={
           <Button render={<Link href="/decks" />}>
-            <ArrowLeft className="size-4" /> Back to decks
+            <ArrowLeft className="size-4" /> {t.deckDetail.backToDecks}
           </Button>
         }
       />
@@ -76,7 +78,7 @@ export default function DeckDetailPage() {
         href="/decks"
         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"
       >
-        <ArrowLeft className="size-4" /> Decks
+        <ArrowLeft className="size-4" /> {t.deckDetail.decks}
       </Link>
 
       <PageHeader
@@ -84,17 +86,17 @@ export default function DeckDetailPage() {
         description={deck.description}
         actions={
           <>
-            <Button variant="outline" size="icon" aria-label="Edit deck" onClick={() => setEditOpen(true)}>
+            <Button variant="outline" size="icon" aria-label={t.deckDetail.editDeck} onClick={() => setEditOpen(true)}>
               <Pencil className="size-4" />
             </Button>
             <Button variant="outline" onClick={() => setAddOpen(true)}>
-              <Plus className="size-4" /> Add card
+              <Plus className="size-4" /> {t.deckDetail.addCard}
             </Button>
             <Button
               disabled={total === 0}
               onClick={() => router.push(`/study/${deck.id}`)}
             >
-              <GraduationCap className="size-4" /> Study
+              <GraduationCap className="size-4" /> {t.deckDetail.study}
             </Button>
           </>
         }
@@ -109,15 +111,15 @@ export default function DeckDetailPage() {
       {total === 0 ? (
         <EmptyState
           icon={BookOpen}
-          title="This deck is empty"
-          description="Add words manually, or generate them instantly with AI."
+          title={t.deckDetail.emptyTitle}
+          description={t.deckDetail.emptyDescription}
           action={
             <div className="flex gap-2">
               <Button onClick={() => setAddOpen(true)}>
-                <Plus className="size-4" /> Add manually
+                <Plus className="size-4" /> {t.deckDetail.addManually}
               </Button>
               <Button variant="outline" render={<Link href="/create" />}>
-                Use AI
+                {t.deckDetail.useAi}
               </Button>
             </div>
           }
@@ -129,7 +131,7 @@ export default function DeckDetailPage() {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={`Search ${total} cards…`}
+              placeholder={t.deckDetail.search.replace("{count}", String(total))}
               className="pl-9"
             />
           </div>
@@ -137,7 +139,7 @@ export default function DeckDetailPage() {
             <CardList cards={filtered} />
           ) : (
             <p className="text-muted-foreground py-8 text-center text-sm">
-              No cards match “{query}”.
+              {t.deckDetail.noMatch.replace("{query}", query)}
             </p>
           )}
         </div>

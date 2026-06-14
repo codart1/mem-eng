@@ -15,8 +15,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CardDialog } from "@/components/cards/card-dialog";
 import { DeckDialog } from "@/components/decks/deck-dialog";
 import { useDecks } from "@/lib/hooks/use-data";
+import { useT } from "@/lib/i18n";
 
 export function ManualCreatePanel() {
+  const t = useT();
   const decks = useDecks();
   const [deckId, setDeckId] = useState<string>("");
   const [cardOpen, setCardOpen] = useState(false);
@@ -26,16 +28,16 @@ export function ManualCreatePanel() {
     return (
       <Alert>
         <Layers className="size-4" />
-        <AlertTitle>No decks yet</AlertTitle>
+        <AlertTitle>{t.manualCreate.noDeckTitle}</AlertTitle>
         <AlertDescription>
-          Create a deck first, then add cards to it.
+          {t.manualCreate.noDeckDescription}
           <Button
             variant="outline"
             size="sm"
             className="mt-2 w-fit"
             onClick={() => setDeckOpen(true)}
           >
-            <Plus className="size-4" /> New deck
+            <Plus className="size-4" /> {t.manualCreate.newDeck}
           </Button>
         </AlertDescription>
         <DeckDialog
@@ -52,10 +54,10 @@ export function ManualCreatePanel() {
   return (
     <div className="max-w-md space-y-4">
       <div className="space-y-2">
-        <Label>Deck</Label>
+        <Label>{t.manualCreate.deck}</Label>
         <Select value={effectiveDeck} onValueChange={(v) => setDeckId(v as string)}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Choose a deck" />
+            <SelectValue placeholder={t.manualCreate.chooseDeck} />
           </SelectTrigger>
           <SelectContent>
             {decks?.map((d) => (
@@ -67,7 +69,7 @@ export function ManualCreatePanel() {
         </Select>
       </div>
       <Button onClick={() => setCardOpen(true)} disabled={!effectiveDeck}>
-        <Plus className="size-4" /> New card
+        <Plus className="size-4" /> {t.manualCreate.newCard}
       </Button>
 
       {effectiveDeck && (

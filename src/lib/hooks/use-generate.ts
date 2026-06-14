@@ -3,9 +3,11 @@
 import { useMutation } from "@tanstack/react-query";
 import type { GeneratedWord } from "@/lib/types";
 import { useSettings } from "./use-data";
+import { useT } from "@/lib/i18n";
 
 export function useGenerateWord() {
   const settings = useSettings();
+  const t = useT();
   return useMutation<GeneratedWord, Error, string>({
     mutationFn: async (word: string) => {
       const res = await fetch("/api/generate", {
@@ -21,7 +23,7 @@ export function useGenerateWord() {
         error?: string;
       };
       if (!res.ok || !data.word) {
-        throw new Error(data.error ?? "Generation failed. Please try again.");
+        throw new Error(data.error ?? t.generate.failed);
       }
       return data.word;
     },

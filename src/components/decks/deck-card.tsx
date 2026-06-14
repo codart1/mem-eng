@@ -18,8 +18,10 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { deckColor } from "@/lib/deck-color";
 import { repository } from "@/lib/db/dexie-repository";
 import type { DeckStat } from "@/lib/hooks/use-data";
+import { useT } from "@/lib/i18n";
 
 export function DeckCard({ stat }: { stat: DeckStat }) {
+  const t = useT();
   const { deck, total, due, newCount } = stat;
   const router = useRouter();
   const color = deckColor(deck.color);
@@ -57,7 +59,7 @@ export function DeckCard({ stat }: { stat: DeckStat }) {
               <Button
                 variant="ghost"
                 size="icon-sm"
-                aria-label="Deck options"
+                aria-label={t.deckCard.options}
                 className="opacity-60 group-hover:opacity-100"
               />
             }
@@ -66,13 +68,13 @@ export function DeckCard({ stat }: { stat: DeckStat }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => setEditOpen(true)}>
-              <Pencil className="size-4" /> Edit
+              <Pencil className="size-4" /> {t.common.edit}
             </DropdownMenuItem>
             <DropdownMenuItem
               variant="destructive"
               onClick={() => setDeleteOpen(true)}
             >
-              <Trash2 className="size-4" /> Delete
+              <Trash2 className="size-4" /> {t.common.delete}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -80,16 +82,16 @@ export function DeckCard({ stat }: { stat: DeckStat }) {
 
       <div className="text-muted-foreground flex items-center gap-4 px-5 text-sm">
         <span className="inline-flex items-center gap-1.5">
-          <Layers className="size-4" /> {total} cards
+          <Layers className="size-4" /> {total} {t.deckCard.cards}
         </span>
         {due > 0 && (
           <span className="text-rating-good inline-flex items-center gap-1.5 font-medium">
-            {due} due
+            {due} {t.deckCard.due}
           </span>
         )}
         {newCount > 0 && (
           <span className="text-brand inline-flex items-center gap-1.5 font-medium">
-            {newCount} new
+            {newCount} {t.deckCard.new}
           </span>
         )}
       </div>
@@ -102,10 +104,10 @@ export function DeckCard({ stat }: { stat: DeckStat }) {
           onClick={() => router.push(`/study/${deck.id}`)}
         >
           <GraduationCap className="size-4" />
-          {actionable ? "Study" : "All done"}
+          {actionable ? t.deckCard.study : t.deckCard.allDone}
         </Button>
         <Button variant="outline" size="sm" render={<Link href={`/decks/${deck.id}`} />}>
-          Browse
+          {t.deckCard.browse}
         </Button>
       </div>
 
@@ -113,13 +115,13 @@ export function DeckCard({ stat }: { stat: DeckStat }) {
       <ConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title={`Delete "${deck.name}"?`}
-        description="This deck and its cards will be removed. This can't be undone."
-        confirmLabel="Delete deck"
+        title={t.deckCard.deleteTitle.replace("{name}", deck.name)}
+        description={t.deckCard.deleteDescription}
+        confirmLabel={t.deckCard.deleteConfirm}
         destructive
         onConfirm={async () => {
           await repository.decks.remove(deck.id);
-          toast.success("Deck deleted");
+          toast.success(t.deckCard.deleted);
         }}
       />
     </Card>

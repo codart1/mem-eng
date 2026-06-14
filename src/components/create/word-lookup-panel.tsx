@@ -10,8 +10,10 @@ import { GeneratedCardPreview } from "./generated-card-preview";
 import { DeckDialog } from "@/components/decks/deck-dialog";
 import { useDecks } from "@/lib/hooks/use-data";
 import { useGenerateWord } from "@/lib/hooks/use-generate";
+import { useT } from "@/lib/i18n";
 
 export function WordLookupPanel() {
+  const t = useT();
   const decks = useDecks();
   const generate = useGenerateWord();
   const [term, setTerm] = useState("");
@@ -37,7 +39,7 @@ export function WordLookupPanel() {
             ref={inputRef}
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            placeholder="Type any English word — e.g. “serendipity”"
+            placeholder={t.wordLookup.placeholder}
             className="h-11 pl-9 text-base"
             autoFocus
           />
@@ -53,23 +55,23 @@ export function WordLookupPanel() {
           ) : (
             <Sparkles className="size-4" />
           )}
-          Generate
+          {t.wordLookup.generate}
         </Button>
       </form>
 
       {noDecks && (
         <Alert>
           <Layers className="size-4" />
-          <AlertTitle>Create a deck to save words</AlertTitle>
+          <AlertTitle>{t.wordLookup.noDeckTitle}</AlertTitle>
           <AlertDescription>
-            You&apos;ll need at least one deck before adding cards.
+            {t.wordLookup.noDeckDescription}
             <Button
               variant="outline"
               size="sm"
               className="mt-2 w-fit"
               onClick={() => setCreateDeckOpen(true)}
             >
-              <Plus className="size-4" /> New deck
+              <Plus className="size-4" /> {t.wordLookup.newDeck}
             </Button>
           </AlertDescription>
         </Alert>

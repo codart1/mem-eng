@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { RATING_LABEL, type RatingKey, type RatingPreview } from "@/lib/srs/scheduler";
+import { type RatingKey, type RatingPreview } from "@/lib/srs/scheduler";
+import { useT } from "@/lib/i18n";
 
 const RATING_VAR: Record<RatingKey, string> = {
   again: "var(--rating-again)",
@@ -23,6 +24,7 @@ interface RatingBarProps {
 }
 
 export function RatingBar({ previews, onRate }: RatingBarProps) {
+  const t = useT();
   return (
     <div className="grid grid-cols-4 gap-2">
       {previews.map((p) => {
@@ -41,7 +43,7 @@ export function RatingBar({ previews, onRate }: RatingBarProps) {
               color,
             }}
           >
-            <span className="text-sm font-semibold">{RATING_LABEL[p.key]}</span>
+            <span className="text-sm font-semibold">{t.rating[p.key]}</span>
             <span className="font-mono text-xs tabular-nums opacity-90">
               {p.intervalLabel}
             </span>

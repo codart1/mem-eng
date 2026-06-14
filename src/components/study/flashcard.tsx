@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { deckColor } from "@/lib/deck-color";
 import type { VocabCard } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 interface FlashcardProps {
   card: VocabCard;
@@ -18,6 +19,7 @@ export function Flashcard({
   onReveal,
   deckColorKey,
 }: FlashcardProps) {
+  const t = useT();
   const accent = deckColor(deckColorKey);
 
   return (
@@ -32,7 +34,7 @@ export function Flashcard({
         <button
           type="button"
           onClick={onReveal}
-          aria-label="Reveal definition"
+          aria-label={t.study.revealAria}
           className={cn(
             "backface-hidden bg-card absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-4 rounded-3xl border p-8 text-center shadow-sm transition-shadow hover:shadow-md",
           )}
@@ -57,7 +59,7 @@ export function Flashcard({
             </p>
           )}
           <p className="text-muted-foreground/70 absolute bottom-6 text-xs">
-            Tap or press Space to reveal
+            {t.study.tapReveal}
           </p>
         </button>
 
@@ -104,7 +106,7 @@ export function Flashcard({
               <div className="flex flex-wrap gap-4 text-sm">
                 {card.synonyms.length > 0 && (
                   <div>
-                    <span className="text-muted-foreground text-xs">Synonyms</span>
+                    <span className="text-muted-foreground text-xs">{t.common.synonyms}</span>
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {card.synonyms.map((s) => (
                         <Badge key={s} variant="secondary">
@@ -116,7 +118,7 @@ export function Flashcard({
                 )}
                 {card.antonyms.length > 0 && (
                   <div>
-                    <span className="text-muted-foreground text-xs">Antonyms</span>
+                    <span className="text-muted-foreground text-xs">{t.common.antonyms}</span>
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {card.antonyms.map((s) => (
                         <Badge key={s} variant="outline">

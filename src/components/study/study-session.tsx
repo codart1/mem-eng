@@ -19,6 +19,7 @@ import {
 } from "@/lib/srs/scheduler";
 import { repository } from "@/lib/db/dexie-repository";
 import type { VocabCard } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 const KEY_TO_RATING: Record<string, RatingKey> = {
   "1": "again",
@@ -28,6 +29,7 @@ const KEY_TO_RATING: Record<string, RatingKey> = {
 };
 
 export function StudySession({ deckId }: { deckId?: string }) {
+  const t = useT();
   const { queue, loading } = useStudyQueue(deckId);
   const settings = useSettings();
   const decks = useDecks();
@@ -155,15 +157,15 @@ export function StudySession({ deckId }: { deckId?: string }) {
     return (
       <EmptyState
         icon={GraduationCap}
-        title="You're all caught up"
-        description="No cards are due right now. Add new words or come back later."
+        title={t.study.caughtUpTitle}
+        description={t.study.caughtUpDescription}
         action={
           <div className="flex gap-2">
             <Button render={<Link href="/create" />}>
-              <Sparkles className="size-4" /> Add words
+              <Sparkles className="size-4" /> {t.study.addWords}
             </Button>
             <Button variant="outline" render={<Link href="/dashboard" />}>
-              Dashboard
+              {t.study.dashboard}
             </Button>
           </div>
         }
@@ -206,7 +208,7 @@ export function StudySession({ deckId }: { deckId?: string }) {
             className="h-12 w-full text-base"
             onClick={() => setRevealed(true)}
           >
-            Show answer
+            {t.study.showAnswer}
           </Button>
         )}
       </div>

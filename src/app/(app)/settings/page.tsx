@@ -37,6 +37,11 @@ export default function SettingsPage() {
   const { locale, setLocale, t } = useI18n();
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // next-themes only knows the active theme after mount; gate the active state
+  // so the segmented control doesn't trigger a hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // Local mirror, hydrated once from the persisted settings.
   const hydrated = useRef(false);
   const [retention, setRetention] = useState(90);
@@ -66,12 +71,12 @@ export default function SettingsPage() {
       dailyNewLimit: Math.max(0, newLimit),
       dailyReviewLimit: Math.max(0, reviewLimit),
     });
-    toast.success("Scheduling settings saved");
+    toast.success(t.settings.schedulingSaved);
   }
 
   async function saveApiKey() {
     await repository.settings.update({ byokApiKey: apiKey.trim() || undefined });
-    toast.success(apiKey.trim() ? "API key saved" : "API key cleared");
+    toast.success(apiKey.trim() ? t.settings.apiKeySaved : t.settings.apiKeyCleared);
   }
 
   async function handleExport() {
@@ -85,44 +90,44 @@ export default function SettingsPage() {
     a.download = `lexio-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Backup downloaded");
+    toast.success(t.settings.backupDownloaded);
   }
 
   async function handleImport(file: File) {
     try {
       const snapshot = JSON.parse(await file.text()) as DataSnapshot;
       if (!snapshot.version || !Array.isArray(snapshot.decks)) {
-        throw new Error("Not a valid Lexio backup.");
+        throw new Error(t.settings.importInvalid);
       }
       await repository.import(snapshot, "merge");
-      toast.success("Backup imported");
+      toast.success(t.settings.backupImported);
     } catch (err) {
       console.error(err);
-      toast.error(err instanceof Error ? err.message : "Import failed.");
+      toast.error(err instanceof Error ? err.message : t.settings.importFailed);
     }
   }
 
   const themes = [
-    { key: "system", label: "System", icon: Monitor },
-    { key: "light", label: "Light", icon: Sun },
-    { key: "dark", label: "Dark", icon: Moon },
+    { key: "system", label: t.settings.themeSystem, icon: Monitor },
+    { key: "light", label: t.settings.themeLight, icon: Sun },
+    { key: "dark", label: t.settings.themeDark, icon: Moon },
   ];
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Settings" description="Personalize Lexio and manage your data." />
+      <PageHeader title={t.settings.title} description={t.settings.description} />
 
       {/* Appearance */}
       <Card>
         <CardHeader>
-          <CardTitle>Appearance</CardTitle>
-          <CardDescription>Choose how Lexio looks.</CardDescription>
+          <CardTitle>{t.settings.appearance}</CardTitle>
+          <CardDescription>{t.settings.appearanceDesc}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="bg-muted inline-flex rounded-lg p-1">
             {themes.map((opt) => {
               const Icon = opt.icon;
-              const active = theme === opt.key;
+              const active = mounted && theme === opt.key;
               return (
                 <button
                   key={opt.key}
@@ -172,16 +177,14 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <SlidersHorizontal className="size-4" /> Scheduling
+            <SlidersHorizontal className="size-4" /> {t.settings.scheduling}
           </CardTitle>
-          <CardDescription>
-            Tune the FSRS algorithm and your daily workload.
-          </CardDescription>
+          <CardDescription>{t.settings.schedulingDesc}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>Target retention</Label>
+              <Label>{t.settings.targetRetention}</Label>
               <span className="text-muted-foreground font-mono text-sm">{retention}%</span>
             </div>
             <Slider
@@ -193,14 +196,12 @@ export default function SettingsPage() {
                 setRetention(Array.isArray(v) ? (v[0] ?? 90) : v)
               }
             />
-            <p className="text-muted-foreground text-xs">
-              Higher retention means more frequent reviews. 90% is a good default.
-            </p>
+            <p className="text-muted-foreground text-xs">{t.settings.retentionHint}</p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="new-limit">New cards / day</Label>
+              <Label htmlFor="new-limit">{t.settings.newPerDay}</Label>
               <Input
                 id="new-limit"
                 type="number"
@@ -210,7 +211,7 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="rev-limit">Reviews / day (0 = ∞)</Label>
+              <Label htmlFor="rev-limit">{t.settings.reviewsPerDay}</Label>
               <Input
                 id="rev-limit"
                 type="number"
@@ -223,15 +224,13 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="fuzz">Interval fuzz</Label>
-              <p className="text-muted-foreground text-xs">
-                Slightly randomize intervals so reviews don&apos;t clump.
-              </p>
+              <Label htmlFor="fuzz">{t.settings.intervalFuzz}</Label>
+              <p className="text-muted-foreground text-xs">{t.settings.fuzzHint}</p>
             </div>
             <Switch id="fuzz" checked={fuzz} onCheckedChange={setFuzz} />
           </div>
 
-          <Button onClick={saveScheduling}>Save scheduling</Button>
+          <Button onClick={saveScheduling}>{t.settings.saveScheduling}</Button>
         </CardContent>
       </Card>
 
@@ -239,16 +238,13 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <KeyRound className="size-4" /> AI generation
+            <KeyRound className="size-4" /> {t.settings.ai}
           </CardTitle>
-          <CardDescription>
-            Lexio generates cards with Claude Haiku. Add your own Anthropic API key to
-            use your account — it&apos;s stored only on this device.
-          </CardDescription>
+          <CardDescription>{t.settings.aiDesc}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-2">
-            <Label htmlFor="api-key">Anthropic API key</Label>
+            <Label htmlFor="api-key">{t.settings.apiKeyLabel}</Label>
             <div className="flex gap-2">
               <Input
                 id="api-key"
@@ -259,13 +255,10 @@ export default function SettingsPage() {
                 className="font-mono"
               />
               <Button variant="outline" onClick={saveApiKey}>
-                Save
+                {t.common.save}
               </Button>
             </div>
-            <p className="text-muted-foreground text-xs">
-              Optional. Without a key, generation uses the server&apos;s key if one is
-              configured. A typical word costs a fraction of a cent.
-            </p>
+            <p className="text-muted-foreground text-xs">{t.settings.apiKeyHint}</p>
           </div>
         </CardContent>
       </Card>
@@ -274,19 +267,17 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Brain className="size-4" /> Your data
+            <Brain className="size-4" /> {t.settings.data}
           </CardTitle>
-          <CardDescription>
-            Everything lives in your browser. Back it up or move it between devices.
-          </CardDescription>
+          <CardDescription>{t.settings.dataDesc}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={handleExport}>
-              <Download className="size-4" /> Export backup
+              <Download className="size-4" /> {t.settings.exportBackup}
             </Button>
             <Button variant="outline" onClick={() => fileRef.current?.click()}>
-              <Upload className="size-4" /> Import backup
+              <Upload className="size-4" /> {t.settings.importBackup}
             </Button>
             <input
               ref={fileRef}
@@ -303,13 +294,13 @@ export default function SettingsPage() {
           <Separator />
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium">Reset everything</p>
+              <p className="text-sm font-medium">{t.settings.resetEverything}</p>
               <p className="text-muted-foreground text-xs">
-                Permanently delete all decks, cards, and history.
+                {t.settings.resetEverythingDesc}
               </p>
             </div>
             <Button variant="destructive" onClick={() => setResetOpen(true)}>
-              <Trash2 className="size-4" /> Reset
+              <Trash2 className="size-4" /> {t.settings.reset}
             </Button>
           </div>
         </CardContent>
@@ -318,9 +309,9 @@ export default function SettingsPage() {
       <ConfirmDialog
         open={resetOpen}
         onOpenChange={setResetOpen}
-        title="Reset all data?"
-        description="This deletes every deck, card, and review log on this device. This cannot be undone."
-        confirmLabel="Delete everything"
+        title={t.settings.resetTitle}
+        description={t.settings.resetDescription}
+        confirmLabel={t.settings.resetConfirm}
         destructive
         onConfirm={async () => {
           await repository.reset();

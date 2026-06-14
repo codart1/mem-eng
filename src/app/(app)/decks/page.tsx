@@ -9,19 +9,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DeckCard } from "@/components/decks/deck-card";
 import { DeckDialog } from "@/components/decks/deck-dialog";
 import { useDeckStats } from "@/lib/hooks/use-data";
+import { useT } from "@/lib/i18n";
 
 export default function DecksPage() {
+  const t = useT();
   const stats = useDeckStats();
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Decks"
-        description="Organize your vocabulary into focused collections."
+        title={t.decks.title}
+        description={t.decks.description}
         actions={
           <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="size-4" /> New deck
+            <Plus className="size-4" /> {t.decks.newDeck}
           </Button>
         }
       />
@@ -35,11 +37,11 @@ export default function DecksPage() {
       ) : stats.length === 0 ? (
         <EmptyState
           icon={Layers}
-          title="No decks yet"
-          description="Create your first deck, then add words manually or with AI."
+          title={t.decks.emptyTitle}
+          description={t.decks.emptyDescription}
           action={
             <Button onClick={() => setCreateOpen(true)}>
-              <Plus className="size-4" /> Create a deck
+              <Plus className="size-4" /> {t.decks.createDeck}
             </Button>
           }
         />

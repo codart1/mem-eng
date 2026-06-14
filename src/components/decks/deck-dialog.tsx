@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { DECK_COLORS, type Deck, type DeckColor } from "@/lib/types";
 import { DECK_COLOR_VALUES } from "@/lib/deck-color";
 import { repository } from "@/lib/db/dexie-repository";
+import { useT } from "@/lib/i18n";
 
 interface DeckDialogProps {
   open: boolean;
@@ -33,6 +34,7 @@ export function DeckDialog({
   deck,
   onSaved,
 }: DeckDialogProps) {
+  const t = useT();
   const editing = Boolean(deck);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -49,7 +51,7 @@ export function DeckDialog({
 
   async function handleSave() {
     if (!name.trim()) {
-      toast.error("Please give the deck a name.");
+      toast.error(t.deckDialog.nameRequired);
       return;
     }
     setSaving(true);
@@ -65,12 +67,12 @@ export function DeckDialog({
             description: description.trim() || undefined,
             color,
           });
-      toast.success(editing ? "Deck updated" : "Deck created");
+      toast.success(editing ? t.deckDialog.updated : t.deckDialog.created);
       if (saved) onSaved?.(saved);
       onOpenChange(false);
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong saving the deck.");
+      toast.error(t.deckDialog.saveError);
     } finally {
       setSaving(false);
     }
@@ -80,35 +82,33 @@ export function DeckDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit deck" : "New deck"}</DialogTitle>
-          <DialogDescription>
-            Decks group related words. Pick a color to tell them apart.
-          </DialogDescription>
+          <DialogTitle>{editing ? t.deckDialog.editTitle : t.deckDialog.newTitle}</DialogTitle>
+          <DialogDescription>{t.deckDialog.description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-1">
           <div className="space-y-2">
-            <Label htmlFor="deck-name">Name</Label>
+            <Label htmlFor="deck-name">{t.deckDialog.name}</Label>
             <Input
               id="deck-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. IELTS Vocabulary"
+              placeholder={t.deckDialog.namePlaceholder}
               autoFocus
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="deck-desc">Description</Label>
+            <Label htmlFor="deck-desc">{t.deckDialog.descLabel}</Label>
             <Textarea
               id="deck-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional — what's this deck for?"
+              placeholder={t.deckDialog.descPlaceholder}
               rows={2}
             />
           </div>
           <div className="space-y-2">
-            <Label>Color</Label>
+            <Label>{t.deckDialog.color}</Label>
             <div className="flex flex-wrap gap-2">
               {DECK_COLORS.map((c) => (
                 <button
@@ -131,10 +131,14 @@ export function DeckDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Saving…" : editing ? "Save changes" : "Create deck"}
+            {saving
+              ? t.common.saving
+              : editing
+                ? t.common.saveChanges
+                : t.deckDialog.createDeck}
           </Button>
         </DialogFooter>
       </DialogContent>

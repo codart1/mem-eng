@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { repository } from "@/lib/db/dexie-repository";
 import type { VocabCard } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 interface CardDialogProps {
   open: boolean;
@@ -38,6 +39,7 @@ const splitCommas = (s: string) =>
     .filter(Boolean);
 
 export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps) {
+  const t = useT();
   const editing = Boolean(card);
   const [word, setWord] = useState("");
   const [phonetic, setPhonetic] = useState("");
@@ -65,7 +67,7 @@ export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps
 
   async function handleSave() {
     if (!word.trim() || !definition.trim()) {
-      toast.error("A word and a definition are required.");
+      toast.error(t.cardDialog.required);
       return;
     }
     setSaving(true);
@@ -83,15 +85,15 @@ export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps
     try {
       if (card) {
         await repository.cards.update(card.id, patch);
-        toast.success("Card updated");
+        toast.success(t.cardDialog.updated);
       } else {
         await repository.cards.create({ deckId, source: "manual", ...patch });
-        toast.success(`Added "${patch.word}"`);
+        toast.success(t.cardDialog.added.replace("{word}", patch.word));
       }
       onOpenChange(false);
     } catch (err) {
       console.error(err);
-      toast.error("Could not save the card.");
+      toast.error(t.cardDialog.saveError);
     } finally {
       setSaving(false);
     }
@@ -101,17 +103,15 @@ export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit card" : "New card"}</DialogTitle>
-          <DialogDescription>
-            Fill in the word details. Examples go one per line.
-          </DialogDescription>
+          <DialogTitle>{editing ? t.cardDialog.editTitle : t.cardDialog.newTitle}</DialogTitle>
+          <DialogDescription>{t.cardDialog.description}</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh] pr-3">
           <div className="space-y-4 px-0.5 py-1">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="c-word">Word</Label>
+                <Label htmlFor="c-word">{t.cardDialog.word}</Label>
                 <Input
                   id="c-word"
                   value={word}
@@ -120,7 +120,7 @@ export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="c-phon">Pronunciation</Label>
+                <Label htmlFor="c-phon">{t.cardDialog.pronunciation}</Label>
                 <Input
                   id="c-phon"
                   value={phonetic}
@@ -133,27 +133,27 @@ export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="c-pos">Part of speech</Label>
+                <Label htmlFor="c-pos">{t.cardDialog.partOfSpeech}</Label>
                 <Input
                   id="c-pos"
                   value={partOfSpeech}
                   onChange={(e) => setPartOfSpeech(e.target.value)}
-                  placeholder="noun, verb…"
+                  placeholder={t.cardDialog.posPlaceholder}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="c-cefr">CEFR level</Label>
+                <Label htmlFor="c-cefr">{t.cardDialog.cefr}</Label>
                 <Input
                   id="c-cefr"
                   value={cefr}
                   onChange={(e) => setCefr(e.target.value)}
-                  placeholder="A1–C2"
+                  placeholder={t.cardDialog.cefrPlaceholder}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="c-def">Definition</Label>
+              <Label htmlFor="c-def">{t.cardDialog.definition}</Label>
               <Textarea
                 id="c-def"
                 value={definition}
@@ -163,44 +163,44 @@ export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="c-ex">Examples</Label>
+              <Label htmlFor="c-ex">{t.cardDialog.examples}</Label>
               <Textarea
                 id="c-ex"
                 value={examples}
                 onChange={(e) => setExamples(e.target.value)}
                 rows={3}
-                placeholder="One example sentence per line"
+                placeholder={t.cardDialog.examplesPlaceholder}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="c-syn">Synonyms</Label>
+                <Label htmlFor="c-syn">{t.common.synonyms}</Label>
                 <Input
                   id="c-syn"
                   value={synonyms}
                   onChange={(e) => setSynonyms(e.target.value)}
-                  placeholder="comma, separated"
+                  placeholder={t.cardDialog.commaSeparated}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="c-ant">Antonyms</Label>
+                <Label htmlFor="c-ant">{t.common.antonyms}</Label>
                 <Input
                   id="c-ant"
                   value={antonyms}
                   onChange={(e) => setAntonyms(e.target.value)}
-                  placeholder="comma, separated"
+                  placeholder={t.cardDialog.commaSeparated}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="c-mn">Memory hook</Label>
+              <Label htmlFor="c-mn">{t.cardDialog.memoryHook}</Label>
               <Input
                 id="c-mn"
                 value={mnemonic}
                 onChange={(e) => setMnemonic(e.target.value)}
-                placeholder="Optional mnemonic"
+                placeholder={t.cardDialog.mnemonicPlaceholder}
               />
             </div>
           </div>
@@ -208,10 +208,14 @@ export function CardDialog({ open, onOpenChange, deckId, card }: CardDialogProps
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Saving…" : editing ? "Save changes" : "Add card"}
+            {saving
+              ? t.common.saving
+              : editing
+                ? t.common.saveChanges
+                : t.cardDialog.addCard}
           </Button>
         </DialogFooter>
       </DialogContent>

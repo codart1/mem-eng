@@ -19,6 +19,7 @@ import {
 import { repository } from "@/lib/db/dexie-repository";
 import { generatedWordToCardInput } from "@/lib/ai/schema";
 import type { Deck, GeneratedWord } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 interface Props {
   word: GeneratedWord;
@@ -33,6 +34,7 @@ export function GeneratedCardPreview({
   defaultDeckId,
   onAdded,
 }: Props) {
+  const t = useT();
   const [deckId, setDeckId] = useState(defaultDeckId ?? decks[0]?.id ?? "");
   const [editedWord, setEditedWord] = useState(word.word);
   const [editedDef, setEditedDef] = useState(word.senses[0]?.definition ?? "");
@@ -40,7 +42,7 @@ export function GeneratedCardPreview({
 
   async function handleAdd() {
     if (!deckId) {
-      toast.error("Pick a deck first.");
+      toast.error(t.genPreview.pickDeck);
       return;
     }
     setAdding(true);
@@ -51,13 +53,13 @@ export function GeneratedCardPreview({
           definition: editedDef,
         }),
       );
-      toast.success(`Added "${editedWord}"`, {
+      toast.success(t.genPreview.addedToast.replace("{word}", editedWord), {
         description: decks.find((d) => d.id === deckId)?.name,
       });
       onAdded();
     } catch (err) {
       console.error(err);
-      toast.error("Could not add the card.");
+      toast.error(t.genPreview.addError);
     } finally {
       setAdding(false);
     }
@@ -109,7 +111,7 @@ export function GeneratedCardPreview({
 
         {word.senses.length > 1 && (
           <div className="text-muted-foreground space-y-1 text-sm">
-            <span className="text-xs font-medium">Other senses</span>
+            <span className="text-xs font-medium">{t.genPreview.otherSenses}</span>
             {word.senses.slice(1).map((s, i) => (
               <p key={i}>
                 <span className="italic">{s.partOfSpeech}</span> — {s.definition}
@@ -122,7 +124,7 @@ export function GeneratedCardPreview({
           <div className="flex flex-wrap gap-4 text-sm">
             {word.synonyms.length > 0 && (
               <div>
-                <span className="text-muted-foreground text-xs">Synonyms</span>
+                <span className="text-muted-foreground text-xs">{t.common.synonyms}</span>
                 <div className="mt-1 flex flex-wrap gap-1.5">
                   {word.synonyms.map((s) => (
                     <Badge key={s} variant="secondary">
@@ -134,7 +136,7 @@ export function GeneratedCardPreview({
             )}
             {word.antonyms.length > 0 && (
               <div>
-                <span className="text-muted-foreground text-xs">Antonyms</span>
+                <span className="text-muted-foreground text-xs">{t.common.antonyms}</span>
                 <div className="mt-1 flex flex-wrap gap-1.5">
                   {word.antonyms.map((s) => (
                     <Badge key={s} variant="outline">
@@ -156,7 +158,7 @@ export function GeneratedCardPreview({
         <div className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center">
           <Select value={deckId} onValueChange={(v) => setDeckId(v as string)}>
             <SelectTrigger className="sm:w-56">
-              <SelectValue placeholder="Choose a deck" />
+              <SelectValue placeholder={t.genPreview.chooseDeck} />
             </SelectTrigger>
             <SelectContent>
               {decks.map((d) => (
@@ -169,11 +171,11 @@ export function GeneratedCardPreview({
           <Button onClick={handleAdd} disabled={adding} className="sm:ml-auto">
             {adding ? (
               <>
-                <Check className="size-4" /> Added
+                <Check className="size-4" /> {t.genPreview.added}
               </>
             ) : (
               <>
-                <Plus className="size-4" /> Add to deck
+                <Plus className="size-4" /> {t.genPreview.add}
               </>
             )}
           </Button>

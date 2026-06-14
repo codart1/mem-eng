@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -26,10 +27,11 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel = "Confirm",
+  confirmLabel,
   destructive,
   onConfirm,
 }: ConfirmDialogProps) {
+  const t = useT();
   const [busy, setBusy] = useState(false);
 
   async function handleConfirm() {
@@ -51,14 +53,14 @@ export function ConfirmDialog({
         </DialogHeader>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button
             variant={destructive ? "destructive" : "default"}
             onClick={handleConfirm}
             disabled={busy}
           >
-            {busy ? "Working…" : confirmLabel}
+            {busy ? t.common.working : (confirmLabel ?? t.common.confirm)}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -26,6 +26,7 @@ import {
   stateBreakdown,
 } from "@/lib/stats";
 import { State } from "ts-fsrs";
+import { useT } from "@/lib/i18n";
 
 const tooltipStyle = {
   background: "var(--popover)",
@@ -36,6 +37,7 @@ const tooltipStyle = {
 };
 
 export default function StatsPage() {
+  const t = useT();
   const cards = useAllCards();
   const logs = useAllLogs();
 
@@ -51,7 +53,7 @@ export default function StatsPage() {
   if (cards === undefined || logs === undefined) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Stats" />
+        <PageHeader title={t.stats.title} />
         <Skeleton className="h-24 w-full rounded-xl" />
         <Skeleton className="h-72 w-full rounded-xl" />
       </div>
@@ -61,11 +63,11 @@ export default function StatsPage() {
   if (logs.length === 0 && cards.length === 0) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Stats" />
+        <PageHeader title={t.stats.title} />
         <EmptyState
           icon={BarChart3}
-          title="No data yet"
-          description="Once you start studying, your progress and forecast will show up here."
+          title={t.stats.noDataTitle}
+          description={t.stats.noDataDescription}
         />
       </div>
     );
@@ -75,32 +77,29 @@ export default function StatsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Stats"
-        description="Track your reviews, retention, and what's coming up."
-      />
+      <PageHeader title={t.stats.title} description={t.stats.description} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total reviews"
+          label={t.stats.totalReviews}
           value={logs.length}
           icon={History}
           accent="var(--brand)"
         />
         <StatCard
-          label="Mature cards"
+          label={t.stats.matureCards}
           value={mature}
           icon={GraduationCap}
           accent="var(--rating-good)"
         />
         <StatCard
-          label="Day streak"
+          label={t.stats.dayStreak}
           value={streak}
           icon={Flame}
           accent="var(--amber)"
         />
         <StatCard
-          label="Retention"
+          label={t.stats.retention}
           value={`${Math.round(retention * 100)}%`}
           icon={TrendingUp}
           accent="var(--rating-easy)"
@@ -109,7 +108,7 @@ export default function StatsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Reviews — last 30 days</CardTitle>
+          <CardTitle>{t.stats.reviewsLast30}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64 w-full">
@@ -130,7 +129,7 @@ export default function StatsPage() {
                   axisLine={false}
                 />
                 <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "var(--muted)" }} />
-                <Bar dataKey="count" name="Reviews" fill="var(--brand)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name={t.stats.reviewsName} fill="var(--brand)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -140,7 +139,7 @@ export default function StatsPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Due forecast — next 14 days</CardTitle>
+            <CardTitle>{t.stats.dueForecast14}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-56 w-full">
@@ -161,7 +160,7 @@ export default function StatsPage() {
                     axisLine={false}
                   />
                   <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "var(--muted)" }} />
-                  <Bar dataKey="count" name="Due" radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="count" name={t.stats.dueName} radius={[4, 4, 0, 0]}>
                     {forecast.map((d, i) => (
                       <Cell
                         key={d.date}
@@ -177,18 +176,18 @@ export default function StatsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Card maturity</CardTitle>
+            <CardTitle>{t.stats.cardMaturity}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <MaturityRow label="New" value={breakdown.new} total={cards.length} color="var(--brand)" />
+            <MaturityRow label={t.stats.new} value={breakdown.new} total={cards.length} color="var(--brand)" />
             <MaturityRow
-              label="Learning"
+              label={t.stats.learning}
               value={breakdown.learning}
               total={cards.length}
               color="var(--rating-hard)"
             />
             <MaturityRow
-              label="Review"
+              label={t.stats.review}
               value={breakdown.review}
               total={cards.length}
               color="var(--rating-good)"
