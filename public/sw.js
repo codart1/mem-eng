@@ -2,7 +2,7 @@
 // Hand-rolled (bundler-agnostic). All user data already lives in IndexedDB; this
 // only caches the static shell and assets.
 
-const VERSION = "lexio-v3";
+const VERSION = "lexio-v4";
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 // "/" is the marketing landing page; "/dashboard" is the app entry (PWA
@@ -12,6 +12,7 @@ const APP_SHELL = [
   "/",
   "/dashboard",
   "/discover",
+  "/news",
   "/manifest.webmanifest",
   "/icon.svg",
 ];

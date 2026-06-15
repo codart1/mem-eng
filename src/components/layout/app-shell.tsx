@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Sparkles,
   Compass,
+  Newspaper,
   BarChart3,
   Settings,
   Home,
@@ -34,6 +35,7 @@ const NAV: NavItem[] = [
   { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard, mobile: true },
   { href: "/decks", labelKey: "decks", icon: Layers, mobile: true },
   { href: "/discover", labelKey: "discover", icon: Compass, mobile: true },
+  { href: "/news", labelKey: "news", icon: Newspaper, mobile: true },
   { href: "/study", labelKey: "study", icon: GraduationCap, showDue: true, mobile: true },
   { href: "/create", labelKey: "create", icon: Sparkles, mobile: true },
   { href: "/stats", labelKey: "stats", icon: BarChart3 },
@@ -133,7 +135,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="bg-background/90 fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t backdrop-blur md:hidden">
+      <nav
+        className="bg-background/90 fixed inset-x-0 bottom-0 z-30 grid border-t backdrop-blur md:hidden"
+        style={{ gridTemplateColumns: `repeat(${MOBILE_NAV.length}, minmax(0, 1fr))` }}
+      >
         {MOBILE_NAV.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
