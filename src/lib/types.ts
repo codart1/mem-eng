@@ -74,11 +74,18 @@ export interface AppSettings {
   /** 0 = unlimited. */
   dailyReviewLimit: number;
   // AI
-  aiProvider: "claude";
-  /** Bring-your-own-key, stored locally only (never sent to our server logs). */
+  /** Which model provider powers AI card generation. */
+  aiProvider: AiProvider;
+  /** Anthropic bring-your-own-key, stored locally only (never logged server-side). */
   byokApiKey?: string;
+  /** OpenAI bring-your-own-key, stored locally only (never logged server-side). */
+  openaiApiKey?: string;
   updatedAt: number;
 }
+
+/** Supported AI providers for card generation. */
+export const AI_PROVIDERS = ["claude", "openai"] as const;
+export type AiProvider = (typeof AI_PROVIDERS)[number];
 
 export const DEFAULT_SETTINGS: Omit<AppSettings, "updatedAt"> = {
   id: "app",

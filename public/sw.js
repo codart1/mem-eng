@@ -2,12 +2,19 @@
 // Hand-rolled (bundler-agnostic). All user data already lives in IndexedDB; this
 // only caches the static shell and assets.
 
-const VERSION = "lexio-v2";
+const VERSION = "lexio-v3";
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 // "/" is the marketing landing page; "/dashboard" is the app entry (PWA
-// start_url). Precache both so first load and the offline fallback work.
-const APP_SHELL = ["/", "/dashboard", "/manifest.webmanifest", "/icon.svg"];
+// start_url). Precache the core routes so first load and the offline fallback
+// work. (/discover still needs the network for /api/word-sets data.)
+const APP_SHELL = [
+  "/",
+  "/dashboard",
+  "/discover",
+  "/manifest.webmanifest",
+  "/icon.svg",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { SpeakButton } from "@/components/speak-button";
 import { deckColor } from "@/lib/deck-color";
 import type { VocabCard } from "@/lib/types";
 import { useT } from "@/lib/i18n";
@@ -77,6 +78,7 @@ export function Flashcard({
                 {card.phonetic}
               </span>
             )}
+            <SpeakButton text={card.word} className="ml-auto self-center" />
           </div>
           <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
             <div>

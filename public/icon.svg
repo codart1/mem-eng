@@ -6,7 +6,10 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <path fill="#ffffff" d="M256 104c10 70 32 92 102 102-70 10-92 32-102 102-10-70-32-92-102-102 70-10 92-32 102-102z"/>
-  <circle cx="372" cy="150" r="20" fill="#ffffff" opacity="0.92"/>
-  <circle cx="150" cy="368" r="14" fill="#ffffff" opacity="0.85"/>
+  <!-- Lexio mark: open book + spark, matching src/components/brand/logo.tsx -->
+  <g fill="#ffffff" transform="translate(72,104) scale(15.5)">
+    <path d="M12 1.2c.25 1.8 1 2.55 2.8 2.8-1.8.25-2.55 1-2.8 2.8-.25-1.8-1-2.55-2.8-2.8 1.8-.25 2.55-1 2.8-2.8Z"/>
+    <path d="M11 8.5C8.6 7.1 5.6 6.7 3.3 7.0 2.8 7.06 2.5 7.4 2.5 7.85L2.5 16.4c0 .45.36.8.8.75 2.3-.25 5.3.15 7.7 1.55Z"/>
+    <path d="M13 8.5c2.4-1.4 5.4-1.8 7.7-1.5.5.06.8.4.8.85L21.5 16.4c0 .45-.36.8-.8.75-2.3-.25-5.3.15-7.7 1.55Z"/>
+  </g>
 </svg>

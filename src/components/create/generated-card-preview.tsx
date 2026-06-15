@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SpeakButton } from "@/components/speak-button";
 import { repository } from "@/lib/db/dexie-repository";
 import { generatedWordToCardInput } from "@/lib/ai/schema";
 import type { Deck, GeneratedWord } from "@/lib/types";
@@ -81,6 +82,7 @@ export function GeneratedCardPreview({
               </span>
             )}
             {word.cefr && <Badge variant="secondary">{word.cefr}</Badge>}
+            <SpeakButton text={editedWord} className="ml-auto" />
           </div>
 
           <div className="space-y-1.5">

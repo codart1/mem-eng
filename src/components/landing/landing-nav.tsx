@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LexioMark } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { useI18n } from "@/lib/i18n";
@@ -37,9 +38,7 @@ export function LandingNav() {
     >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="bg-brand text-brand-foreground grid size-8 place-items-center rounded-lg shadow-sm">
-            <Sparkles className="size-4.5" />
-          </span>
+          <LexioMark className="size-8 rounded-lg" glyphClassName="size-4.5" />
           <span className="font-serif text-xl leading-none font-semibold tracking-tight">
             Lexio
           </span>

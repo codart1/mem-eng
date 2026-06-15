@@ -5,12 +5,33 @@ export const en = {
   nav: {
     dashboard: "Dashboard",
     decks: "Decks",
+    discover: "Discover",
     study: "Study",
     create: "Create",
     stats: "Stats",
     settings: "Settings",
+    landing: "Landing page",
     offlineFirst: "Offline-first",
     toggleTheme: "Toggle theme",
+  },
+
+  speak: {
+    tooltip: "Read aloud",
+    listen: 'Listen to "{word}"',
+  },
+
+  discover: {
+    title: "Discover word sets",
+    description:
+      "Hand-picked collections from the Lexio team. Add a set to get a ready-made deck in one tap.",
+    words: "{count} words",
+    add: "Add to my decks",
+    added: "Added",
+    addedToast: 'Added "{title}"',
+    addError: "Could not add this set. Please try again.",
+    loadError: "Couldn't load word sets. Check your connection and try again.",
+    emptyTitle: "No featured sets yet",
+    emptyDescription: "Check back soon — we're curating more collections.",
   },
 
   language: {
@@ -411,8 +432,18 @@ export const en = {
     schedulingSaved: "Scheduling settings saved",
     ai: "AI generation",
     aiDesc:
-      "Lexio generates cards with Claude Haiku. Add your own Anthropic API key to use your account — it's stored only on this device.",
+      "Choose which model builds your cards, and add your own API key to use your account — keys are stored only on this device.",
+    aiProvider: "Provider",
+    providerNames: {
+      claude: "Claude",
+      openai: "OpenAI",
+    },
+    providerHints: {
+      claude: "Uses Claude Haiku — fast, accurate, with native structured output.",
+      openai: "Uses GPT-4o mini — a low-cost OpenAI model with structured output.",
+    },
     apiKeyLabel: "Anthropic API key",
+    openaiKeyLabel: "OpenAI API key",
     apiKeyHint:
       "Optional. Without a key, generation uses the server's key if one is configured. A typical word costs a fraction of a cent.",
     apiKeySaved: "API key saved",

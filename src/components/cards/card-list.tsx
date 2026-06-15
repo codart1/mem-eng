@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CardStateBadge } from "./card-state-badge";
 import { CardDialog } from "./card-dialog";
+import { SpeakButton } from "@/components/speak-button";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { repository } from "@/lib/db/dexie-repository";
 import type { VocabCard } from "@/lib/types";
@@ -37,6 +38,7 @@ function CardRow({ card }: { card: VocabCard }) {
               {card.partOfSpeech}
             </span>
           )}
+          <SpeakButton text={card.word} size="icon-xs" className="-my-1" />
         </div>
         <p className="text-muted-foreground mt-0.5 line-clamp-2 text-sm">
           {card.definition}

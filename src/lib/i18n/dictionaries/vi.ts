@@ -6,12 +6,33 @@ export const vi: Dictionary = {
   nav: {
     dashboard: "Tổng quan",
     decks: "Bộ thẻ",
+    discover: "Khám phá",
     study: "Học",
     create: "Tạo thẻ",
     stats: "Thống kê",
     settings: "Cài đặt",
+    landing: "Trang giới thiệu",
     offlineFirst: "Hoạt động offline",
     toggleTheme: "Đổi giao diện sáng/tối",
+  },
+
+  speak: {
+    tooltip: "Đọc to",
+    listen: 'Nghe phát âm "{word}"',
+  },
+
+  discover: {
+    title: "Khám phá bộ từ",
+    description:
+      "Các bộ từ do đội ngũ Lexio tuyển chọn. Thêm một bộ để có ngay bộ thẻ sẵn sàng chỉ với một chạm.",
+    words: "{count} từ",
+    add: "Thêm vào bộ thẻ của tôi",
+    added: "Đã thêm",
+    addedToast: 'Đã thêm "{title}"',
+    addError: "Không thể thêm bộ này. Vui lòng thử lại.",
+    loadError: "Không tải được bộ từ. Kiểm tra kết nối và thử lại.",
+    emptyTitle: "Chưa có bộ nổi bật",
+    emptyDescription: "Hãy quay lại sau — chúng tôi đang tuyển chọn thêm nhiều bộ từ.",
   },
 
   language: {
@@ -412,8 +433,18 @@ export const vi: Dictionary = {
     schedulingSaved: "Đã lưu cài đặt lập lịch",
     ai: "Tạo bằng AI",
     aiDesc:
-      "Lexio tạo thẻ bằng Claude Haiku. Thêm khóa API Anthropic của riêng bạn để dùng tài khoản của mình — khóa chỉ được lưu trên thiết bị này.",
+      "Chọn mô hình tạo thẻ cho bạn, và thêm khóa API của riêng bạn để dùng tài khoản của mình — khóa chỉ được lưu trên thiết bị này.",
+    aiProvider: "Nhà cung cấp",
+    providerNames: {
+      claude: "Claude",
+      openai: "OpenAI",
+    },
+    providerHints: {
+      claude: "Dùng Claude Haiku — nhanh, chính xác, có đầu ra cấu trúc gốc.",
+      openai: "Dùng GPT-4o mini — mô hình OpenAI chi phí thấp, có đầu ra cấu trúc.",
+    },
     apiKeyLabel: "Khóa API Anthropic",
+    openaiKeyLabel: "Khóa API OpenAI",
     apiKeyHint:
       "Tùy chọn. Không có khóa, việc tạo thẻ sẽ dùng khóa của máy chủ nếu được cấu hình. Một từ thông thường tốn một phần nhỏ của xu.",
     apiKeySaved: "Đã lưu khóa API",

@@ -14,6 +14,21 @@ Each lookup is tiny:
 So cost is dominated by a few hundred output tokens per card — fractions of a
 cent regardless of provider.
 
+## Providers
+
+Lexio supports two providers, chosen per user in **Settings → AI generation**:
+
+- **Claude** (default) — `claude-haiku-4-5` via the official Anthropic SDK.
+- **OpenAI** — `gpt-4o-mini` via a direct `fetch` to the Chat Completions API (no
+  extra dependency).
+
+Both use **native structured outputs**: we pass the same JSON Schema
+(`WORD_JSON_SCHEMA` in `src/lib/ai/schema.ts`) so the model always returns valid,
+parseable JSON, which is then validated with Zod. The schema is written
+strict-compatible (`additionalProperties: false` with every field `required`,
+including nested objects), which is exactly what OpenAI's `strict: true` mode
+requires — so the same schema drives both providers unchanged.
+
 ## Why Claude Haiku 4.5
 
 We default to **`claude-haiku-4-5`** via the official Anthropic SDK because:
@@ -43,15 +58,24 @@ Negligible at indie scale.
 | Gemini 2.5 Flash-Lite | ~$0.10–0.25 | ~$0.40–1.50 | Cheapest, 1M context |
 
 Because per-lookup cost is already a fraction of a cent, model choice here is
-about **quality and integration**, not pennies. The provider is isolated to a
-single file — see below — so switching is a localized change.
+about **quality and integration**, not pennies.
+
+### Why `gpt-4o-mini` for the OpenAI option
+
+It's OpenAI's cheapest general-purpose model that supports **strict Structured
+Outputs** ($0.15 / $0.60 per 1M input/output tokens — even cheaper than Haiku),
+and its quality is more than sufficient for short dictionary entries. If you want
+to go cheaper still, `gpt-4.1-nano`/`gpt-4.1-mini` are drop-in swaps (change
+`OPENAI_MODEL`); for higher quality, `gpt-4.1`. All support the same
+`response_format: { type: "json_schema", strict: true }`.
 
 ## How to change the provider or model
 
 Everything lives in **`src/app/api/generate/route.ts`**. To swap models, change
-the `MODEL` constant. To swap providers entirely, replace the Anthropic call
-with another client and keep returning the same shape validated by
-`generatedWordSchema`. Nothing else in the app needs to change.
+the `CLAUDE_MODEL` / `OPENAI_MODEL` constants. The two providers are isolated in
+`generateWithClaude` / `generateWithOpenAI`, both returning the same JSON string
+validated by `generatedWordSchema`. To add a third provider, add another such
+function and branch on it. Nothing else in the app needs to change.
 
 ## Who pays (key custody)
 

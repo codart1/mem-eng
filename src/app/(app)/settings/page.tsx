@@ -30,6 +30,7 @@ import { LOCALES, LOCALE_LABELS } from "@/lib/i18n/config";
 import { useSettings } from "@/lib/hooks/use-data";
 import { repository } from "@/lib/db/dexie-repository";
 import type { DataSnapshot } from "@/lib/db/repository";
+import { AI_PROVIDERS, type AiProvider } from "@/lib/types";
 
 export default function SettingsPage() {
   const settings = useSettings();
@@ -49,7 +50,9 @@ export default function SettingsPage() {
   const [fuzz, setFuzz] = useState(true);
   const [newLimit, setNewLimit] = useState(20);
   const [reviewLimit, setReviewLimit] = useState(200);
-  const [apiKey, setApiKey] = useState("");
+  const [provider, setProvider] = useState<AiProvider>("claude");
+  const [anthropicKey, setAnthropicKey] = useState("");
+  const [openaiKey, setOpenaiKey] = useState("");
   const [resetOpen, setResetOpen] = useState(false);
 
   useEffect(() => {
@@ -60,8 +63,15 @@ export default function SettingsPage() {
     setFuzz(settings.enableFuzz);
     setNewLimit(settings.dailyNewLimit);
     setReviewLimit(settings.dailyReviewLimit);
-    setApiKey(settings.byokApiKey ?? "");
+    setProvider(settings.aiProvider);
+    setAnthropicKey(settings.byokApiKey ?? "");
+    setOpenaiKey(settings.openaiApiKey ?? "");
   }, [settings]);
+
+  async function changeProvider(next: AiProvider) {
+    setProvider(next);
+    await repository.settings.update({ aiProvider: next });
+  }
 
   async function saveScheduling() {
     await repository.settings.update({
@@ -75,8 +85,13 @@ export default function SettingsPage() {
   }
 
   async function saveApiKey() {
-    await repository.settings.update({ byokApiKey: apiKey.trim() || undefined });
-    toast.success(apiKey.trim() ? t.settings.apiKeySaved : t.settings.apiKeyCleared);
+    const value = (provider === "openai" ? openaiKey : anthropicKey).trim();
+    await repository.settings.update(
+      provider === "openai"
+        ? { openaiApiKey: value || undefined }
+        : { byokApiKey: value || undefined },
+    );
+    toast.success(value ? t.settings.apiKeySaved : t.settings.apiKeyCleared);
   }
 
   async function handleExport() {
@@ -242,16 +257,50 @@ export default function SettingsPage() {
           </CardTitle>
           <CardDescription>{t.settings.aiDesc}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="api-key">{t.settings.apiKeyLabel}</Label>
+            <Label>{t.settings.aiProvider}</Label>
+            <div className="bg-muted inline-flex rounded-lg p-1">
+              {AI_PROVIDERS.map((p) => {
+                const active = provider === p;
+                return (
+                  <button
+                    key={p}
+                    onClick={() => changeProvider(p as AiProvider)}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                      active
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {t.settings.providerNames[p]}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-muted-foreground text-xs">
+              {t.settings.providerHints[provider]}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="api-key">
+              {provider === "openai"
+                ? t.settings.openaiKeyLabel
+                : t.settings.apiKeyLabel}
+            </Label>
             <div className="flex gap-2">
               <Input
                 id="api-key"
                 type="password"
-                placeholder="sk-ant-…"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
+                placeholder={provider === "openai" ? "sk-…" : "sk-ant-…"}
+                value={provider === "openai" ? openaiKey : anthropicKey}
+                onChange={(e) =>
+                  provider === "openai"
+                    ? setOpenaiKey(e.target.value)
+                    : setAnthropicKey(e.target.value)
+                }
                 className="font-mono"
               />
               <Button variant="outline" onClick={saveApiKey}>

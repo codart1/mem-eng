@@ -7,13 +7,16 @@ import {
   Layers,
   GraduationCap,
   Sparkles,
+  Compass,
   BarChart3,
   Settings,
+  Home,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
+import { LexioMark } from "@/components/brand/logo";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { DueBadge } from "./due-badge";
@@ -23,16 +26,21 @@ type NavItem = {
   labelKey: keyof Dictionary["nav"];
   icon: LucideIcon;
   showDue?: boolean;
+  /** Whether to surface this item in the compact mobile bottom bar. */
+  mobile?: boolean;
 };
 
 const NAV: NavItem[] = [
-  { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard },
-  { href: "/decks", labelKey: "decks", icon: Layers },
-  { href: "/study", labelKey: "study", icon: GraduationCap, showDue: true },
-  { href: "/create", labelKey: "create", icon: Sparkles },
+  { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard, mobile: true },
+  { href: "/decks", labelKey: "decks", icon: Layers, mobile: true },
+  { href: "/discover", labelKey: "discover", icon: Compass, mobile: true },
+  { href: "/study", labelKey: "study", icon: GraduationCap, showDue: true, mobile: true },
+  { href: "/create", labelKey: "create", icon: Sparkles, mobile: true },
   { href: "/stats", labelKey: "stats", icon: BarChart3 },
-  { href: "/settings", labelKey: "settings", icon: Settings },
+  { href: "/settings", labelKey: "settings", icon: Settings, mobile: true },
 ];
+
+const MOBILE_NAV = NAV.filter((item) => item.mobile);
 
 function isActive(pathname: string, href: string) {
   if (href === "/dashboard") return pathname === "/dashboard";
@@ -42,9 +50,7 @@ function isActive(pathname: string, href: string) {
 function Wordmark() {
   return (
     <Link href="/dashboard" className="flex items-center gap-2.5">
-      <span className="bg-brand text-brand-foreground grid size-9 place-items-center rounded-xl shadow-sm">
-        <Sparkles className="size-5" />
-      </span>
+      <LexioMark />
       <span className="font-serif text-2xl leading-none font-semibold tracking-tight">
         Lexio
       </span>
@@ -84,6 +90,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          <Link
+            href="/"
+            className="group text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground mt-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+          >
+            <Home className="size-[18px]" />
+            <span className="flex-1">{t.nav.landing}</span>
+          </Link>
         </nav>
         <div className="flex items-center justify-between border-t pt-3">
           <span className="text-muted-foreground px-2 text-xs">
@@ -102,6 +115,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="bg-background/80 sticky top-0 z-30 flex items-center justify-between border-b px-4 py-3 backdrop-blur md:hidden">
           <Wordmark />
           <div className="flex items-center">
+            <Link
+              href="/"
+              aria-label={t.nav.landing}
+              className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-8 items-center justify-center rounded-lg transition-colors"
+            >
+              <Home className="size-5" />
+            </Link>
             <LanguageToggle />
             <ThemeToggle />
           </div>
@@ -114,7 +134,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile bottom nav */}
       <nav className="bg-background/90 fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t backdrop-blur md:hidden">
-        {NAV.map((item) => {
+        {MOBILE_NAV.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
           return (

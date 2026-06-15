@@ -10,12 +10,17 @@ export function useGenerateWord() {
   const t = useT();
   return useMutation<GeneratedWord, Error, string>({
     mutationFn: async (word: string) => {
+      const apiKey =
+        settings.aiProvider === "openai"
+          ? settings.openaiApiKey
+          : settings.byokApiKey;
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           word,
-          apiKey: settings.byokApiKey || undefined,
+          provider: settings.aiProvider,
+          apiKey: apiKey || undefined,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as {
