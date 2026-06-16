@@ -13,59 +13,49 @@ export interface FeedSource {
  * learner-appropriate writing and stable public RSS endpoints — no key, no
  * signup, no quota. Keep this list small so a single request stays fast.
  */
-// NOTE: every publisher here must allow plain server-side fetching of its
-// article pages, since the in-app reader extracts them. BBC was dropped because
-// it blocks server fetches by TLS fingerprint (the reader could never load it).
+// NOTE: the in-app reader fetches each publisher's article pages through impit
+// (see ./http.ts), which impersonates a real Chrome TLS/HTTP fingerprint, so
+// fingerprint-based blocking is no longer the constraint. These three sources
+// were chosen for reliable, clean Readability extraction across many articles;
+// together their section feeds cover every category in NEWS_CATEGORIES.
 export const NEWS_FEEDS: FeedSource[] = [
-  // Top / general
+  // The Guardian — open journalism, section feeds cover most categories.
   {
-    source: "Al Jazeera",
-    url: "https://www.aljazeera.com/xml/rss/all.xml",
+    source: "The Guardian",
+    url: "https://www.theguardian.com/international/rss",
     category: "top",
   },
-  // World
   {
     source: "The Guardian",
     url: "https://www.theguardian.com/world/rss",
     category: "world",
   },
-  // Business
   {
     source: "The Guardian",
     url: "https://www.theguardian.com/business/rss",
     category: "business",
   },
   {
-    source: "CNBC",
-    url: "https://www.cnbc.com/id/10001147/device/rss/rss.html",
-    category: "business",
-  },
-  // Science
-  {
-    source: "ScienceDaily",
-    url: "https://www.sciencedaily.com/rss/top/science.xml",
-    category: "science",
-  },
-  {
-    source: "NASA",
-    url: "https://www.nasa.gov/news-release/feed/",
-    category: "science",
-  },
-  {
     source: "The Guardian",
     url: "https://www.theguardian.com/science/rss",
     category: "science",
-  },
-  // Technology
-  {
-    source: "The Verge",
-    url: "https://www.theverge.com/rss/index.xml",
-    category: "technology",
   },
   {
     source: "The Guardian",
     url: "https://www.theguardian.com/technology/rss",
     category: "technology",
+  },
+  // The Verge — technology.
+  {
+    source: "The Verge",
+    url: "https://www.theverge.com/rss/index.xml",
+    category: "technology",
+  },
+  // NASA — science, US-government public domain (effectively never blocks).
+  {
+    source: "NASA",
+    url: "https://www.nasa.gov/news-release/feed/",
+    category: "science",
   },
 ];
 
@@ -76,11 +66,9 @@ export const NEWS_FEEDS: FeedSource[] = [
  * Keep in sync with the publishers in {@link NEWS_FEEDS}.
  */
 export const ALLOWED_ARTICLE_HOSTS = [
-  "aljazeera.com",
   "theguardian.com",
-  "cnbc.com",
-  "sciencedaily.com",
   "theverge.com",
+  // Covers nasa.gov and science.nasa.gov (where many articles actually live).
   "nasa.gov",
 ];
 

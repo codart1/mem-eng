@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { NEWS_FEEDS } from "@/lib/news/feeds";
 import { parseFeed } from "@/lib/news/parse";
+import { fetchAsBrowser } from "@/lib/news/http";
 import type { NewsArticle } from "@/lib/news/types";
 
 export const runtime = "nodejs";
@@ -20,14 +21,9 @@ async function loadFeed(
   fetchedAt: number,
 ): Promise<NewsArticle[]> {
   try {
-    const res = await fetch(feed.url, {
-      headers: {
-        // Some publishers reject the default fetch UA.
-        "user-agent": "LexioNewsReader/1.0 (+https://lexio.app)",
-        accept: "application/rss+xml, application/atom+xml, application/xml, text/xml",
-      },
-      next: { revalidate },
-      signal: AbortSignal.timeout(FEED_TIMEOUT_MS),
+    const res = await fetchAsBrowser(feed.url, {
+      timeoutMs: FEED_TIMEOUT_MS,
+      accept: "application/rss+xml, application/atom+xml, application/xml, text/xml",
     });
     if (!res.ok) return [];
     const xml = await res.text();

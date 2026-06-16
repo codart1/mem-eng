@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAllowedArticleUrl } from "@/lib/news/feeds";
 import { extractArticle } from "@/lib/news/article";
+import { fetchAsBrowser } from "@/lib/news/http";
 
 export const runtime = "nodejs";
 // Articles don't change once published; cache extracted content for an hour.
@@ -23,14 +24,9 @@ export async function GET(req: Request) {
 
   let html: string;
   try {
-    const res = await fetch(url, {
-      headers: {
-        "user-agent":
-          "Mozilla/5.0 (compatible; LexioNewsReader/1.0; +https://lexio.app)",
-        accept: "text/html,application/xhtml+xml",
-      },
-      next: { revalidate },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    const res = await fetchAsBrowser(url, {
+      timeoutMs: FETCH_TIMEOUT_MS,
+      accept: "text/html,application/xhtml+xml",
     });
     if (!res.ok) {
       return NextResponse.json(
