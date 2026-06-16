@@ -20,9 +20,17 @@ export function useArticle(url: string | undefined) {
           return {};
         })) as ArticleContent & {
           error?: string;
+          message?: string;
+          stack?: string;
         };
         if (!res.ok) {
-          const errMsg = data.error ?? `Failed to load the article. (HTTP status: ${res.status})`;
+          let errMsg = data.error ?? `Failed to load the article. (HTTP status: ${res.status})`;
+          if (data.message) {
+            errMsg += ` - Details: ${data.message}`;
+          }
+          if (data.stack) {
+            errMsg += `\nServer Stack Trace:\n${data.stack}`;
+          }
           throw new Error(errMsg);
         }
         return data;
