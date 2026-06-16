@@ -583,6 +583,30 @@ export const en = {
   generate: {
     failed: "Generation failed. Please try again.",
   },
+
+  assistant: {
+    fab: "Study assistant",
+    title: "Study assistant",
+    subtitle: "Ask about your progress or get word ideas",
+    greeting:
+      "Hi! I can summarize your progress, answer questions about your decks, and suggest new words to learn. What would you like to do?",
+    placeholder: "Ask me anything…",
+    send: "Send",
+    thinking: "Thinking…",
+    clear: "Clear chat",
+    error: "Something went wrong. Please try again.",
+    starterSummary: "Summarize my progress",
+    starterSuggest: "Suggest words to learn",
+    starterWeak: "What should I review?",
+    words: "{count} words",
+    add: "Add as deck",
+    adding: "Generating…",
+    added: "Added",
+    addedToast: 'Added "{title}" — {count} cards',
+    someFailed: "Added {added} of {total} cards.",
+    addFailed: "Couldn't add this set. Please try again.",
+    addAllFailed: "Couldn't generate any cards. Check your AI key in Settings.",
+  },
 };
 
 export type Dictionary = typeof en;

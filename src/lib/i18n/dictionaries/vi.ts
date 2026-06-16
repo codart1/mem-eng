@@ -582,4 +582,28 @@ export const vi: Dictionary = {
   generate: {
     failed: "Tạo thất bại. Vui lòng thử lại.",
   },
+
+  assistant: {
+    fab: "Trợ lý học tập",
+    title: "Trợ lý học tập",
+    subtitle: "Hỏi về tiến độ hoặc gợi ý từ vựng",
+    greeting:
+      "Chào bạn! Mình có thể tóm tắt tiến độ, trả lời câu hỏi về bộ thẻ và gợi ý từ mới để học. Bạn muốn làm gì?",
+    placeholder: "Hỏi mình bất cứ điều gì…",
+    send: "Gửi",
+    thinking: "Đang suy nghĩ…",
+    clear: "Xóa trò chuyện",
+    error: "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    starterSummary: "Tóm tắt tiến độ của tôi",
+    starterSuggest: "Gợi ý từ để học",
+    starterWeak: "Tôi nên ôn gì?",
+    words: "{count} từ",
+    add: "Thêm thành bộ thẻ",
+    adding: "Đang tạo…",
+    added: "Đã thêm",
+    addedToast: 'Đã thêm "{title}" — {count} thẻ',
+    someFailed: "Đã thêm {added}/{total} thẻ.",
+    addFailed: "Không thể thêm bộ này. Vui lòng thử lại.",
+    addAllFailed: "Không thể tạo thẻ nào. Hãy kiểm tra khóa AI trong Cài đặt.",
+  },
 };

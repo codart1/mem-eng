@@ -33,6 +33,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { DueBadge } from "./due-badge";
 import { InstallButton } from "./install-button";
+import { AssistantFab } from "@/components/assistant/assistant-fab";
 
 type NavItem = {
   href: string;
@@ -259,6 +260,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           />
         ))}
       </nav>
+
+      {/* Floating study assistant, available on every in-app page. */}
+      <AssistantFab />
     </div>
   );
 }
