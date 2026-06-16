@@ -11,12 +11,17 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:login": "supabase login",
+    "db:link": "supabase link --project-ref bubdaivjqzjjkulyuwbu",
+    "db:push": "supabase db push"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
     "@base-ui/react": "^1.5.0",
     "@mozilla/readability": "^0.6.0",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.2",
     "@tanstack/react-query": "^5.101.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -58,6 +63,7 @@
     "prettier": "^3.8.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "sharp": "^0.35.1",
+    "supabase": "^2.106.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",

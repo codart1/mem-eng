@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { LOCALES, LOCALE_LABELS } from "@/lib/i18n/config";
 import { useSettings } from "@/lib/hooks/use-data";
+import { AccountCard } from "@/components/account/account-card";
 import { repository } from "@/lib/db/dexie-repository";
 import type { DataSnapshot } from "@/lib/db/repository";
 import { AI_PROVIDERS, type AiProvider } from "@/lib/types";
@@ -131,6 +132,9 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title={t.settings.title} description={t.settings.description} />
+
+      {/* Account + cloud sync (hidden entirely when Supabase isn't configured) */}
+      <AccountCard />
 
       {/* Appearance */}
       <Card>

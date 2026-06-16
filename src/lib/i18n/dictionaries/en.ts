@@ -580,6 +580,58 @@ export const en = {
     resetConfirm: "Delete everything",
   },
 
+  account: {
+    // Settings card
+    title: "Account",
+    description: "Optional. Sign in to sync your decks across devices.",
+    signedOutBody:
+      "Lexio works fully offline without an account. Create one to back up and sync your vocabulary to the cloud.",
+    signIn: "Sign in",
+    createAccount: "Create account",
+    signOut: "Sign out",
+    signedOut: "Signed out",
+    signedInAs: "Signed in as",
+
+    // Auth pages
+    signInTitle: "Welcome back",
+    signInSubtitle: "Sign in to sync your vocabulary.",
+    signUpTitle: "Create your account",
+    signUpSubtitle: "Back up and sync your decks across devices.",
+    email: "Email",
+    emailPlaceholder: "you@example.com",
+    password: "Password",
+    passwordPlaceholder: "At least 8 characters",
+    confirmPassword: "Confirm password",
+    noAccount: "Don't have an account?",
+    haveAccount: "Already have an account?",
+    signingIn: "Signing in…",
+    creatingAccount: "Creating account…",
+    backToApp: "Back to app",
+
+    // Confirmation + validation
+    confirmTitle: "Check your inbox",
+    confirmBody:
+      "We sent a confirmation link to {email}. Click it to activate your account, then sign in.",
+    emailInvalid: "Please enter a valid email.",
+    passwordMin: "Password must be at least 8 characters.",
+    passwordMismatch: "Passwords don't match.",
+    welcomeBack: "Welcome back!",
+    accountCreated: "Account created.",
+
+    sync: {
+      title: "Cloud sync",
+      description:
+        "Your decks, cards, and review history sync automatically. Books stay on this device.",
+      syncNow: "Sync now",
+      syncing: "Syncing…",
+      lastSynced: "Last synced {time}",
+      never: "Not synced yet",
+      done: "Synced",
+      error: "Sync failed. We'll try again shortly.",
+      offline: "You're offline — changes will sync when you reconnect.",
+    },
+  },
+
   generate: {
     failed: "Generation failed. Please try again.",
   },

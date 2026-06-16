@@ -579,6 +579,58 @@ export const vi: Dictionary = {
     resetConfirm: "Xóa tất cả",
   },
 
+  account: {
+    // Thẻ trong Cài đặt
+    title: "Tài khoản",
+    description: "Tùy chọn. Đăng nhập để đồng bộ bộ thẻ giữa các thiết bị.",
+    signedOutBody:
+      "Lexio hoạt động hoàn toàn ngoại tuyến mà không cần tài khoản. Tạo tài khoản để sao lưu và đồng bộ từ vựng lên đám mây.",
+    signIn: "Đăng nhập",
+    createAccount: "Tạo tài khoản",
+    signOut: "Đăng xuất",
+    signedOut: "Đã đăng xuất",
+    signedInAs: "Đang đăng nhập",
+
+    // Trang xác thực
+    signInTitle: "Chào mừng trở lại",
+    signInSubtitle: "Đăng nhập để đồng bộ từ vựng của bạn.",
+    signUpTitle: "Tạo tài khoản",
+    signUpSubtitle: "Sao lưu và đồng bộ bộ thẻ giữa các thiết bị.",
+    email: "Email",
+    emailPlaceholder: "ban@vidu.com",
+    password: "Mật khẩu",
+    passwordPlaceholder: "Ít nhất 8 ký tự",
+    confirmPassword: "Xác nhận mật khẩu",
+    noAccount: "Chưa có tài khoản?",
+    haveAccount: "Đã có tài khoản?",
+    signingIn: "Đang đăng nhập…",
+    creatingAccount: "Đang tạo tài khoản…",
+    backToApp: "Quay lại ứng dụng",
+
+    // Xác nhận + kiểm tra
+    confirmTitle: "Kiểm tra hộp thư",
+    confirmBody:
+      "Chúng tôi đã gửi liên kết xác nhận tới {email}. Nhấp vào liên kết để kích hoạt tài khoản, rồi đăng nhập.",
+    emailInvalid: "Vui lòng nhập email hợp lệ.",
+    passwordMin: "Mật khẩu phải có ít nhất 8 ký tự.",
+    passwordMismatch: "Mật khẩu không khớp.",
+    welcomeBack: "Chào mừng trở lại!",
+    accountCreated: "Đã tạo tài khoản.",
+
+    sync: {
+      title: "Đồng bộ đám mây",
+      description:
+        "Bộ thẻ, thẻ và lịch sử ôn tập tự động đồng bộ. Sách vẫn nằm trên thiết bị này.",
+      syncNow: "Đồng bộ ngay",
+      syncing: "Đang đồng bộ…",
+      lastSynced: "Đồng bộ lần cuối {time}",
+      never: "Chưa đồng bộ",
+      done: "Đã đồng bộ",
+      error: "Đồng bộ thất bại. Sẽ thử lại sau.",
+      offline: "Bạn đang ngoại tuyến — thay đổi sẽ đồng bộ khi kết nối lại.",
+    },
+  },
+
   generate: {
     failed: "Tạo thất bại. Vui lòng thử lại.",
   },
