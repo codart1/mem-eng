@@ -4,6 +4,11 @@ import type {
   ReviewLogEntry,
   AppSettings,
   DeckColor,
+  Book,
+  BookContent,
+  Bookmark,
+  Chapter,
+  ReadingProgress,
 } from "@/lib/types";
 
 export interface NewDeckInput {
@@ -70,6 +75,46 @@ export interface SettingsRepository {
   ): Promise<AppSettings>;
 }
 
+/** Everything needed to store a freshly parsed book (see `@/lib/epub`). */
+export interface NewBookInput {
+  title: string;
+  author?: string;
+  language?: string;
+  cover?: Blob;
+  fileName: string;
+  fileSize: number;
+  chapters: Chapter[];
+  resources: Record<string, Blob>;
+}
+
+export interface BookRepository {
+  list(): Promise<Book[]>;
+  get(id: string): Promise<Book | undefined>;
+  /** The heavy parsed content (chapters + image blobs), loaded on demand. */
+  getContent(bookId: string): Promise<BookContent | undefined>;
+  create(input: NewBookInput): Promise<Book>;
+  /** Persist reading position; `lastReadAt` is stamped by the repo. */
+  updateProgress(
+    id: string,
+    progress: Partial<Omit<ReadingProgress, "lastReadAt">>,
+  ): Promise<void>;
+  /** Removes the book, its content, and its bookmarks. */
+  remove(id: string): Promise<void>;
+}
+
+export interface NewBookmarkInput {
+  bookId: string;
+  chapterIndex: number;
+  type: Bookmark["type"];
+  text?: string;
+}
+
+export interface BookmarkRepository {
+  listByBook(bookId: string): Promise<Bookmark[]>;
+  add(input: NewBookmarkInput): Promise<Bookmark>;
+  remove(id: string): Promise<void>;
+}
+
 /** Serializable snapshot of all user data, for backup/restore. */
 export interface DataSnapshot {
   version: 1;
@@ -85,6 +130,8 @@ export interface Repository {
   cards: CardRepository;
   reviews: ReviewRepository;
   settings: SettingsRepository;
+  books: BookRepository;
+  bookmarks: BookmarkRepository;
   export(): Promise<DataSnapshot>;
   import(snapshot: DataSnapshot, mode: "merge" | "replace"): Promise<void>;
   reset(): Promise<void>;

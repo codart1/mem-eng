@@ -10,6 +10,7 @@ import {
   Sparkles,
   Compass,
   Newspaper,
+  BookOpen,
   BarChart3,
   Settings,
   Home,
@@ -44,6 +45,7 @@ const NAV: NavItem[] = [
   { href: "/decks", labelKey: "decks", icon: Layers },
   { href: "/discover", labelKey: "discover", icon: Compass },
   { href: "/news", labelKey: "news", icon: Newspaper },
+  { href: "/library", labelKey: "library", icon: BookOpen },
   { href: "/study", labelKey: "study", icon: GraduationCap, showDue: true },
   { href: "/create", labelKey: "create", icon: Sparkles },
   { href: "/stats", labelKey: "stats", icon: BarChart3 },
@@ -56,7 +58,7 @@ const byHref = (href: string) => NAV.find((item) => item.href === href)!;
 // each side of a raised "Create" button. Everything else lives in the More sheet.
 const PRIMARY_TABS = ["/dashboard", "/decks", "/news", "/study"].map(byHref);
 const CREATE_ITEM = byHref("/create");
-const MORE_ITEMS = ["/discover", "/stats", "/settings"].map(byHref);
+const MORE_ITEMS = ["/library", "/discover", "/stats", "/settings"].map(byHref);
 
 function isActive(pathname: string, href: string) {
   if (href === "/dashboard") return pathname === "/dashboard";

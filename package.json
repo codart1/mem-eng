@@ -24,6 +24,7 @@
     "date-fns": "^4.4.0",
     "dexie": "^4.4.3",
     "dexie-react-hooks": "^4.4.0",
+    "fflate": "^0.8.3",
     "impit": "^0.14.1",
     "linkedom": "^0.18.12",
     "lucide-react": "^1.18.0",

@@ -37,6 +37,8 @@ interface Props {
   onDeckIdChange: (id: string) => void;
   /** Called after a card is saved, with the lowercased headword. */
   onAdded: (word: string) => void;
+  /** Override the sheet subtitle for context (news vs. a book). */
+  subtitle?: string;
 }
 
 export function WordAddSheet({
@@ -46,6 +48,7 @@ export function WordAddSheet({
   deckId,
   onDeckIdChange,
   onAdded,
+  subtitle,
 }: Props) {
   const t = useT();
   const define = useDefineWord();
@@ -66,21 +69,21 @@ export function WordAddSheet({
 
   async function handleAdd() {
     if (!result || !deckId) {
-      toast.error(t.news.pickDeck);
+      toast.error(t.vocab.pickDeck);
       return;
     }
     setAdding(true);
     try {
       const headword = result.word.word;
       await repository.cards.create(generatedWordToCardInput(result.word, deckId));
-      toast.success(t.news.addedToast.replace("{word}", headword), {
+      toast.success(t.vocab.addedToast.replace("{word}", headword), {
         description: decks.find((d) => d.id === deckId)?.name,
       });
       onAdded(headword.toLowerCase());
       onOpenChange(false);
     } catch (err) {
       console.error(err);
-      toast.error(t.news.addError);
+      toast.error(t.vocab.addError);
     } finally {
       setAdding(false);
     }
@@ -94,7 +97,7 @@ export function WordAddSheet({
             {word}
             {word && <SpeakButton text={result?.word.word ?? word} />}
           </SheetTitle>
-          <SheetDescription>{t.news.addSheetSubtitle}</SheetDescription>
+          <SheetDescription>{subtitle ?? t.vocab.addSheetSubtitle}</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-4 px-4 pb-4">
@@ -128,7 +131,7 @@ export function WordAddSheet({
                   ) : (
                     <BookOpen className="size-3" />
                   )}
-                  {result.source === "ai" ? t.news.sourceAi : t.news.sourceDict}
+                  {result.source === "ai" ? t.vocab.sourceAi : t.vocab.sourceDict}
                 </Badge>
               </div>
 
@@ -157,7 +160,7 @@ export function WordAddSheet({
                   disabled={define.isPending}
                   onClick={() => word && define.mutate({ word, preferAi: true })}
                 >
-                  <Sparkles className="size-4" /> {t.news.richerWithAi}
+                  <Sparkles className="size-4" /> {t.vocab.richerWithAi}
                 </Button>
               )}
             </>
@@ -165,8 +168,8 @@ export function WordAddSheet({
 
           {noDecks ? (
             <Alert>
-              <AlertTitle>{t.news.noDeckTitle}</AlertTitle>
-              <AlertDescription>{t.news.noDeckDescription}</AlertDescription>
+              <AlertTitle>{t.vocab.noDeckTitle}</AlertTitle>
+              <AlertDescription>{t.vocab.noDeckDescription}</AlertDescription>
             </Alert>
           ) : (
             <div className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center">
@@ -177,8 +180,8 @@ export function WordAddSheet({
                 <SelectTrigger className="sm:w-52">
                   {/* Render the name explicitly: Base UI's Value only learns an
                       item's label once the (portaled) list has mounted. */}
-                  <SelectValue placeholder={t.news.chooseDeck}>
-                    {decks.find((d) => d.id === deckId)?.name ?? t.news.chooseDeck}
+                  <SelectValue placeholder={t.vocab.chooseDeck}>
+                    {decks.find((d) => d.id === deckId)?.name ?? t.vocab.chooseDeck}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -199,7 +202,7 @@ export function WordAddSheet({
                 ) : (
                   <Plus className="size-4" />
                 )}
-                {t.news.addToDeck}
+                {t.vocab.addToDeck}
               </Button>
             </div>
           )}

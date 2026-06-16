@@ -6,7 +6,7 @@ import { ExternalLink, Sparkles, Loader2, Wand2, BookOpenText } from "lucide-rea
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TappableText } from "./tappable-text";
+import { TappableText } from "@/components/vocab/tappable-text";
 import { useSummarizeArticle } from "@/lib/hooks/use-summarize";
 import type { NewsArticle } from "@/lib/news/types";
 import { useT } from "@/lib/i18n";

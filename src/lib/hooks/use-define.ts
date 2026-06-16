@@ -46,7 +46,7 @@ export function useDefineWord() {
         error?: string;
       };
       if (!res.ok || !data.word) {
-        throw new Error(data.error ?? t.news.lookupFailed);
+        throw new Error(data.error ?? t.vocab.lookupFailed);
       }
       return { word: data.word, source: data.source ?? "dictionary" };
     },

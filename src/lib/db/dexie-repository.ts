@@ -6,8 +6,12 @@ import {
   type CardRepository,
   type ReviewRepository,
   type SettingsRepository,
+  type BookRepository,
+  type BookmarkRepository,
   type NewDeckInput,
   type NewCardInput,
+  type NewBookInput,
+  type NewBookmarkInput,
   type DataSnapshot,
 } from "./repository";
 import {
@@ -15,6 +19,8 @@ import {
   type VocabCard,
   type ReviewLogEntry,
   type AppSettings,
+  type Book,
+  type Bookmark,
   DEFAULT_SETTINGS,
 } from "@/lib/types";
 import { uid, now } from "@/lib/utils";
@@ -154,6 +160,94 @@ const reviewRepo: ReviewRepository = {
   },
 };
 
+const bookRepo: BookRepository = {
+  async list() {
+    const books = await db.books.toArray();
+    return books
+      .filter(notDeleted)
+      .sort((a, b) => b.progress.lastReadAt - a.progress.lastReadAt);
+  },
+  async get(id) {
+    const book = await db.books.get(id);
+    return book && notDeleted(book) ? book : undefined;
+  },
+  async getContent(bookId) {
+    return db.bookContents.get(bookId);
+  },
+  async create(input: NewBookInput) {
+    const ts = now();
+    const id = uid();
+    const book: Book = {
+      id,
+      title: input.title.trim() || "Untitled book",
+      author: input.author?.trim() || undefined,
+      language: input.language,
+      format: "epub",
+      fileName: input.fileName,
+      fileSize: input.fileSize,
+      coverBlob: input.cover,
+      chapterCount: input.chapters.length,
+      progress: { chapterIndex: 0, scrollRatio: 0, pct: 0, lastReadAt: ts },
+      createdAt: ts,
+      updatedAt: ts,
+      deletedAt: null,
+    };
+    await db.transaction("rw", db.books, db.bookContents, async () => {
+      await db.books.add(book);
+      await db.bookContents.add({
+        bookId: id,
+        chapters: input.chapters,
+        resources: input.resources,
+      });
+    });
+    return book;
+  },
+  async updateProgress(id, patch) {
+    const book = await db.books.get(id);
+    if (!book) return;
+    await db.books.update(id, {
+      progress: { ...book.progress, ...patch, lastReadAt: now() },
+      updatedAt: now(),
+    });
+  },
+  async remove(id) {
+    // Books carry large blobs, so hard-delete to reclaim storage (books are
+    // excluded from export/import, so there's no sync history to preserve).
+    await db.transaction("rw", db.books, db.bookContents, db.bookmarks, async () => {
+      await db.books.delete(id);
+      await db.bookContents.delete(id);
+      await db.bookmarks.where("bookId").equals(id).delete();
+    });
+  },
+};
+
+const bookmarkRepo: BookmarkRepository = {
+  async listByBook(bookId) {
+    const marks = await db.bookmarks.where("bookId").equals(bookId).toArray();
+    return marks
+      .filter(notDeleted)
+      .sort((a, b) => a.createdAt - b.createdAt);
+  },
+  async add(input: NewBookmarkInput) {
+    const ts = now();
+    const mark: Bookmark = {
+      id: uid(),
+      bookId: input.bookId,
+      chapterIndex: input.chapterIndex,
+      type: input.type,
+      text: input.text,
+      createdAt: ts,
+      updatedAt: ts,
+      deletedAt: null,
+    };
+    await db.bookmarks.add(mark);
+    return mark;
+  },
+  async remove(id) {
+    await db.bookmarks.delete(id);
+  },
+};
+
 const settingsRepo: SettingsRepository = {
   async get() {
     const existing = await db.settings.get("app");
@@ -198,6 +292,8 @@ export const repository: Repository = {
   cards: cardRepo,
   reviews: reviewRepo,
   settings: settingsRepo,
+  books: bookRepo,
+  bookmarks: bookmarkRepo,
 
   async export() {
     const [decks, cards, reviewLogs, settings] = await Promise.all([
@@ -242,20 +338,17 @@ export const repository: Repository = {
   },
 
   async reset() {
-    await db.transaction(
-      "rw",
+    const tables = [
       db.decks,
       db.cards,
       db.reviewLogs,
       db.settings,
-      async () => {
-        await Promise.all([
-          db.decks.clear(),
-          db.cards.clear(),
-          db.reviewLogs.clear(),
-          db.settings.clear(),
-        ]);
-      },
-    );
+      db.books,
+      db.bookContents,
+      db.bookmarks,
+    ];
+    await db.transaction("rw", tables, async () => {
+      await Promise.all(tables.map((t) => t.clear()));
+    });
   },
 };

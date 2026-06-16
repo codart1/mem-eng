@@ -79,7 +79,7 @@ export function SelectionVocab({ onSelect }: { onSelect: (phrase: string) => voi
       >
         <Plus className="size-4 shrink-0" />
         <span className="truncate">
-          {t.news.addPhrase.replace("{text}", phrase)}
+          {t.vocab.addPhrase.replace("{text}", phrase)}
         </span>
       </button>
     </div>,
