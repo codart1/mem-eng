@@ -14,6 +14,7 @@ export const en = {
     landing: "Landing page",
     offlineFirst: "Offline-first",
     toggleTheme: "Toggle theme",
+    more: "More",
   },
 
   speak: {

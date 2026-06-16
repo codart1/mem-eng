@@ -15,6 +15,7 @@ export const vi: Dictionary = {
     landing: "Trang giới thiệu",
     offlineFirst: "Hoạt động offline",
     toggleTheme: "Đổi giao diện sáng/tối",
+    more: "Thêm",
   },
 
   speak: {

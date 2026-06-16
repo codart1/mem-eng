@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,12 +13,21 @@ import {
   BarChart3,
   Settings,
   Home,
+  Plus,
+  MoreHorizontal,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { LexioMark } from "@/components/brand/logo";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { DueBadge } from "./due-badge";
@@ -27,26 +37,59 @@ type NavItem = {
   labelKey: keyof Dictionary["nav"];
   icon: LucideIcon;
   showDue?: boolean;
-  /** Whether to surface this item in the compact mobile bottom bar. */
-  mobile?: boolean;
 };
 
 const NAV: NavItem[] = [
-  { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard, mobile: true },
-  { href: "/decks", labelKey: "decks", icon: Layers, mobile: true },
-  { href: "/discover", labelKey: "discover", icon: Compass, mobile: true },
-  { href: "/news", labelKey: "news", icon: Newspaper, mobile: true },
-  { href: "/study", labelKey: "study", icon: GraduationCap, showDue: true, mobile: true },
-  { href: "/create", labelKey: "create", icon: Sparkles, mobile: true },
+  { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard },
+  { href: "/decks", labelKey: "decks", icon: Layers },
+  { href: "/discover", labelKey: "discover", icon: Compass },
+  { href: "/news", labelKey: "news", icon: Newspaper },
+  { href: "/study", labelKey: "study", icon: GraduationCap, showDue: true },
+  { href: "/create", labelKey: "create", icon: Sparkles },
   { href: "/stats", labelKey: "stats", icon: BarChart3 },
-  { href: "/settings", labelKey: "settings", icon: Settings, mobile: true },
+  { href: "/settings", labelKey: "settings", icon: Settings },
 ];
 
-const MOBILE_NAV = NAV.filter((item) => item.mobile);
+const byHref = (href: string) => NAV.find((item) => item.href === href)!;
+
+// The compact mobile bar surfaces only the daily-loop destinations: two tabs on
+// each side of a raised "Create" button. Everything else lives in the More sheet.
+const PRIMARY_TABS = ["/dashboard", "/decks", "/news", "/study"].map(byHref);
+const CREATE_ITEM = byHref("/create");
+const MORE_ITEMS = ["/discover", "/stats", "/settings"].map(byHref);
 
 function isActive(pathname: string, href: string) {
   if (href === "/dashboard") return pathname === "/dashboard";
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function BottomTab({
+  item,
+  active,
+  label,
+}: {
+  item: NavItem;
+  active: boolean;
+  label: string;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        "relative flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-medium transition-colors",
+        active ? "text-brand" : "text-muted-foreground",
+      )}
+    >
+      <Icon className="size-5" />
+      <span>{label}</span>
+      {item.showDue && (
+        <span className="absolute top-1 right-[22%]">
+          <DueBadge compact />
+        </span>
+      )}
+    </Link>
+  );
 }
 
 function Wordmark() {
@@ -63,6 +106,7 @@ function Wordmark() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const t = useT();
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
     <div className="flex min-h-dvh w-full">
@@ -126,6 +170,41 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
             <LanguageToggle />
             <ThemeToggle />
+            <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+              <SheetTrigger
+                aria-label={t.nav.more}
+                className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-8 items-center justify-center rounded-lg transition-colors"
+              >
+                <MoreHorizontal className="size-5" />
+              </SheetTrigger>
+              <SheetContent side="bottom" className="pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
+                <SheetHeader>
+                  <SheetTitle>{t.nav.more}</SheetTitle>
+                </SheetHeader>
+                <nav className="grid grid-cols-3 gap-2 px-4 pb-2">
+                  {MORE_ITEMS.map((item) => {
+                    const active = isActive(pathname, item.href);
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMoreOpen(false)}
+                        className={cn(
+                          "flex flex-col items-center gap-2 rounded-xl border p-4 text-xs font-medium transition-colors",
+                          active
+                            ? "border-brand/40 bg-brand/10 text-brand"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        )}
+                      >
+                        <Icon className="size-5" />
+                        <span>{t.nav[item.labelKey]}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </header>
 
@@ -134,33 +213,44 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav: two tabs, a raised Create button, two more tabs. */}
       <nav
-        className="bg-background/90 fixed inset-x-0 bottom-0 z-30 grid border-t backdrop-blur md:hidden"
-        style={{ gridTemplateColumns: `repeat(${MOBILE_NAV.length}, minmax(0, 1fr))` }}
+        className="bg-background/90 fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t backdrop-blur md:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
-        {MOBILE_NAV.map((item) => {
-          const active = isActive(pathname, item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "relative flex flex-col items-center gap-1 py-2 text-[10px] font-medium transition-colors",
-                active ? "text-brand" : "text-muted-foreground",
-              )}
-            >
-              <Icon className="size-5" />
-              <span>{t.nav[item.labelKey]}</span>
-              {item.showDue && (
-                <span className="absolute top-1 right-[22%]">
-                  <DueBadge compact />
-                </span>
-              )}
-            </Link>
-          );
-        })}
+        {PRIMARY_TABS.slice(0, 2).map((item) => (
+          <BottomTab
+            key={item.href}
+            item={item}
+            active={isActive(pathname, item.href)}
+            label={t.nav[item.labelKey]}
+          />
+        ))}
+
+        {/* Center "Create" — raised so it reads as the primary action. */}
+        <div className="relative flex flex-1 items-center justify-center">
+          <Link
+            href={CREATE_ITEM.href}
+            aria-label={t.nav[CREATE_ITEM.labelKey]}
+            className={cn(
+              "ring-background absolute -top-5 flex size-14 items-center justify-center rounded-full shadow-lg ring-4 transition-transform active:scale-95",
+              isActive(pathname, CREATE_ITEM.href)
+                ? "bg-brand text-brand-foreground ring-brand/30"
+                : "bg-brand text-brand-foreground",
+            )}
+          >
+            <Plus className="size-6" />
+          </Link>
+        </div>
+
+        {PRIMARY_TABS.slice(2).map((item) => (
+          <BottomTab
+            key={item.href}
+            item={item}
+            active={isActive(pathname, item.href)}
+            label={t.nav[item.labelKey]}
+          />
+        ))}
       </nav>
     </div>
   );
