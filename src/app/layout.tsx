@@ -9,6 +9,12 @@ import { ServiceWorkerRegister } from "@/components/service-worker-register";
 // without a flash. Mirrors resolveLocale() in src/lib/i18n/config.ts.
 const localeScript = `(function(){try{var l=null,s=localStorage.getItem("lexio-locale"),o=["en","vi"];if(s&&o.indexOf(s)>-1){l=s}else{var a=navigator.languages||[navigator.language||"en"];for(var i=0;i<a.length;i++){var b=(a[i]||"").toLowerCase().split("-")[0];if(o.indexOf(b)>-1){l=b;break}}}if(!l)l="en";var d=document.documentElement;d.lang=l;d.dataset.lexioLocale=l}catch(e){}})();`;
 
+// Chrome can fire `beforeinstallprompt` before React mounts, so capture the
+// event here and re-dispatch a custom event that the install button's hook
+// (use-pwa-install) listens for. Without this, an early event would be missed
+// and the install button wouldn't appear.
+const installPromptScript = `(function(){window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__lexioBIP=e;window.dispatchEvent(new Event("lexio-bip"))});})();`;
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -61,6 +67,7 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <script dangerouslySetInnerHTML={{ __html: localeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: installPromptScript }} />
         <Providers>
           {children}
           <Toaster richColors position="top-center" />

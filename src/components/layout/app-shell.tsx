@@ -32,6 +32,7 @@ import {
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { DueBadge } from "./due-badge";
+import { InstallButton } from "./install-button";
 
 type NavItem = {
   href: string;
@@ -146,6 +147,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="flex-1">{t.nav.landing}</span>
           </Link>
         </nav>
+        <InstallButton className="mb-3 w-full justify-start" variant="ghost" />
         <div className="flex items-center justify-between border-t pt-3">
           <span className="text-muted-foreground px-2 text-xs">
             {t.nav.offlineFirst}
@@ -205,6 +207,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     );
                   })}
                 </nav>
+                <div className="px-4 pt-2">
+                  <InstallButton className="w-full" />
+                </div>
               </SheetContent>
             </Sheet>
           </div>

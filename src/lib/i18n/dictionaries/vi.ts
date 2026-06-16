@@ -142,6 +142,17 @@ export const vi: Dictionary = {
     description: "Chọn ngôn ngữ cho giao diện Lexio.",
   },
 
+  install: {
+    button: "Cài đặt ứng dụng",
+    installedToast: "Đã cài Lexio — tìm trên màn hình chính của bạn.",
+    iosTitle: "Cài đặt Lexio",
+    iosIntro:
+      "Thêm Lexio vào màn hình chính để dùng như ứng dụng thật — hoạt động hoàn toàn offline.",
+    iosStep1: "Chạm nút Chia sẻ trên thanh công cụ của Safari.",
+    iosStep2: 'Cuộn xuống và chạm "Thêm vào MH chính".',
+    iosStep3: 'Chạm "Thêm" để hoàn tất.',
+  },
+
   landing: {
     nav: {
       features: "Tính năng",

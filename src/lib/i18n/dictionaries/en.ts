@@ -143,6 +143,17 @@ export const en = {
     description: "Choose the language for Lexio's interface.",
   },
 
+  install: {
+    button: "Install app",
+    installedToast: "Lexio installed — find it on your home screen.",
+    iosTitle: "Install Lexio",
+    iosIntro:
+      "Add Lexio to your home screen to use it like a native app — fully offline.",
+    iosStep1: "Tap the Share button in Safari's toolbar.",
+    iosStep2: 'Scroll down and tap "Add to Home Screen".',
+    iosStep3: 'Tap "Add" to finish.',
+  },
+
   landing: {
     nav: {
       features: "Features",
