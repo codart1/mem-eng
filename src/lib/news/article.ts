@@ -1,4 +1,4 @@
-import { JSDOM } from "jsdom";
+import { parseHTML } from "linkedom";
 import { Readability } from "@mozilla/readability";
 import type { ArticleBlock, ArticleContent } from "./types";
 
@@ -7,6 +7,12 @@ import type { ArticleBlock, ArticleContent } from "./types";
  * structured {@link ArticleBlock}s plus a cover image. Uses Mozilla Readability
  * (the engine behind Firefox Reader View) for the main content, then walks the
  * result into a safe block list — we never hand raw HTML to the client.
+ *
+ * Parsing uses {@link parseHTML} from linkedom (a pure-JS DOM) rather than jsdom:
+ * it has no native code or dynamic requires, so it bundles cleanly into the
+ * Vercel serverless function. jsdom failed to get traced into the deployed
+ * function, which crashed `/api/article` at import time. Relative URLs are
+ * resolved manually against `baseUrl`, so we don't rely on a DOM base URL.
  */
 
 const MAX_BLOCKS = 400;
@@ -137,21 +143,18 @@ function toBlocks(container: Element, baseUrl: string): ArticleBlock[] {
 
 /** Extract readable content from a raw HTML page, or throw on failure. */
 export function extractArticle(html: string, url: string): ArticleContent {
-  const dom = new JSDOM(html, { url });
-  const doc = dom.window.document;
-  const leadImage = findLeadImage(doc, url);
+  const { document: doc } = parseHTML(html);
+  const leadImage = findLeadImage(doc as unknown as Document, url);
 
   // Readability mutates the document, so capture meta before parsing.
-  const reader = new Readability(doc, { keepClasses: false });
+  const reader = new Readability(doc as unknown as Document, { keepClasses: false });
   const parsed = reader.parse();
   if (!parsed || !parsed.content) {
     throw new Error("Could not extract this article.");
   }
 
-  const fragment = new JSDOM(
-    `<div id="root">${parsed.content}</div>`,
-    { url },
-  ).window.document.getElementById("root")!;
+  const { document: fragDoc } = parseHTML(`<div id="root">${parsed.content}</div>`);
+  const fragment = fragDoc.getElementById("root")! as unknown as Element;
 
   const blocks = toBlocks(fragment, url);
   if (blocks.length === 0) {
