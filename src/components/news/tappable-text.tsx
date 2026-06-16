@@ -29,6 +29,15 @@ interface Props {
 export function TappableText({ text, onWord, savedWords, className }: Props) {
   const tokens = useMemo(() => text.match(TOKEN_RE) ?? [], [text]);
 
+  // Single tap = look up one word. But the user might instead be drag-selecting
+  // a phrase/idiom (handled by SelectionVocab); if so the selection is not
+  // collapsed at click time, and we let the selection flow take over.
+  const handleClick = (word: string) => {
+    const sel = typeof window !== "undefined" ? window.getSelection() : null;
+    if (sel && !sel.isCollapsed) return;
+    onWord(word);
+  };
+
   return (
     <span className={className}>
       {tokens.map((token, i) => {
@@ -39,17 +48,19 @@ export function TappableText({ text, onWord, savedWords, className }: Props) {
         }
         const saved = savedWords?.has(word.toLowerCase());
         return (
-          <button
+          <span
             key={i}
-            type="button"
-            onClick={() => onWord(word)}
+            role="button"
+            tabIndex={-1}
+            onClick={() => handleClick(word)}
             className={cn(
-              "rounded-sm transition-colors hover:bg-brand/15 hover:text-foreground focus-visible:bg-brand/15 focus-visible:outline-none",
-              saved && "bg-brand/10 text-brand decoration-brand/40 underline underline-offset-2",
+              "cursor-pointer rounded-sm transition-colors hover:bg-brand/15 hover:text-foreground",
+              saved &&
+                "bg-brand/10 text-brand decoration-brand/40 underline underline-offset-2",
             )}
           >
             {token}
-          </button>
+          </span>
         );
       })}
     </span>

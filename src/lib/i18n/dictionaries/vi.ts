@@ -41,7 +41,8 @@ export const vi: Dictionary = {
     description:
       "Đọc tin tức tiếng Anh mới nhất, và chạm vào từ bất kỳ để thêm vào danh sách từ vựng.",
     refresh: "Làm mới",
-    tapHint: "Chạm vào từ bất kỳ trong bài để tra nghĩa và thêm vào bộ thẻ.",
+    tapHint:
+      "Chạm vào từ — hoặc bôi đen một cụm từ — để tra nghĩa và thêm vào bộ thẻ.",
     loadError: "Không tải được tin tức. Kiểm tra kết nối và thử lại.",
     emptyTitle: "Hiện chưa có tin",
     emptyDescription: "Hãy thử chủ đề khác, hoặc làm mới sau giây lát.",
@@ -56,7 +57,14 @@ export const vi: Dictionary = {
     simplify: "Viết lại dễ hiểu",
     simplifiedLabel: "Bản dễ đọc",
     keyWords: "Từ khóa:",
+    addPhrase: "Thêm “{text}”",
     readFull: "Đọc bài đầy đủ",
+    readArticle: "Đọc bài",
+    openOriginal: "Mở bài gốc",
+    backToNews: "Tin tức",
+    readMinutes: "Đọc {min} phút",
+    readerDisclaimer:
+      "Chế độ đọc. Nội dung bài viết thuộc về {source}; mở bài gốc để ủng hộ tòa soạn.",
     simplifyFailed: "Không thể viết lại bài này. Vui lòng thử lại.",
     lookupFailed: "Không tra được từ này. Vui lòng thử lại.",
     addSheetSubtitle: "Thêm từ này vào một bộ thẻ của bạn.",

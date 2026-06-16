@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/empty-state";
 import { ArticleCard } from "@/components/news/article-card";
 import { WordAddSheet } from "@/components/news/word-add-sheet";
+import { SelectionVocab } from "@/components/news/selection-vocab";
 import { useNews } from "@/lib/hooks/use-news";
 import { useDecks, useAllCards } from "@/lib/hooks/use-data";
 import { NEWS_CATEGORIES } from "@/lib/news/types";
@@ -113,6 +114,8 @@ export default function NewsPage() {
           ))}
         </div>
       )}
+
+      <SelectionVocab onSelect={setSelectedWord} />
 
       <WordAddSheet
         word={selectedWord}

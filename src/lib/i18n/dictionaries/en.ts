@@ -40,7 +40,8 @@ export const en = {
     description:
       "Read recent English news, and tap any word to add it to your vocabulary.",
     refresh: "Refresh",
-    tapHint: "Tap any word in an article to look it up and add it to a deck.",
+    tapHint:
+      "Tap any word — or select a phrase — to look it up and add it to a deck.",
     loadError: "Couldn't load the news. Check your connection and try again.",
     emptyTitle: "No stories right now",
     emptyDescription: "Try another topic, or refresh in a moment.",
@@ -55,7 +56,14 @@ export const en = {
     simplify: "Simplify for learners",
     simplifiedLabel: "Simplified",
     keyWords: "Key words:",
+    addPhrase: "Add “{text}”",
     readFull: "Read full story",
+    readArticle: "Read article",
+    openOriginal: "Open original",
+    backToNews: "News",
+    readMinutes: "{min} min read",
+    readerDisclaimer:
+      "Reader view. Article content belongs to {source}; open the original to support the publisher.",
     simplifyFailed: "Couldn't simplify this article. Please try again.",
     lookupFailed: "Couldn't look up that word. Please try again.",
     addSheetSubtitle: "Add this word to one of your decks.",

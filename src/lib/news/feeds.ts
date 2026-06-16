@@ -13,16 +13,17 @@ export interface FeedSource {
  * learner-appropriate writing and stable public RSS endpoints — no key, no
  * signup, no quota. Keep this list small so a single request stays fast.
  */
+// NOTE: every publisher here must allow plain server-side fetching of its
+// article pages, since the in-app reader extracts them. BBC was dropped because
+// it blocks server fetches by TLS fingerprint (the reader could never load it).
 export const NEWS_FEEDS: FeedSource[] = [
   // Top / general
-  { source: "BBC News", url: "https://feeds.bbci.co.uk/news/rss.xml", category: "top" },
-  { source: "NPR", url: "https://feeds.npr.org/1001/rss.xml", category: "top" },
-  // World
   {
-    source: "BBC World",
-    url: "https://feeds.bbci.co.uk/news/world/rss.xml",
-    category: "world",
+    source: "Al Jazeera",
+    url: "https://www.aljazeera.com/xml/rss/all.xml",
+    category: "top",
   },
+  // World
   {
     source: "The Guardian",
     url: "https://www.theguardian.com/world/rss",
@@ -30,14 +31,19 @@ export const NEWS_FEEDS: FeedSource[] = [
   },
   // Business
   {
-    source: "BBC Business",
-    url: "https://feeds.bbci.co.uk/news/business/rss.xml",
+    source: "The Guardian",
+    url: "https://www.theguardian.com/business/rss",
+    category: "business",
+  },
+  {
+    source: "CNBC",
+    url: "https://www.cnbc.com/id/10001147/device/rss/rss.html",
     category: "business",
   },
   // Science
   {
-    source: "BBC Science",
-    url: "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+    source: "ScienceDaily",
+    url: "https://www.sciencedaily.com/rss/top/science.xml",
     category: "science",
   },
   {
@@ -45,10 +51,50 @@ export const NEWS_FEEDS: FeedSource[] = [
     url: "https://www.nasa.gov/news-release/feed/",
     category: "science",
   },
+  {
+    source: "The Guardian",
+    url: "https://www.theguardian.com/science/rss",
+    category: "science",
+  },
   // Technology
   {
-    source: "BBC Technology",
-    url: "https://feeds.bbci.co.uk/news/technology/rss.xml",
+    source: "The Verge",
+    url: "https://www.theverge.com/rss/index.xml",
+    category: "technology",
+  },
+  {
+    source: "The Guardian",
+    url: "https://www.theguardian.com/technology/rss",
     category: "technology",
   },
 ];
+
+/**
+ * Host suffixes whose article pages the in-app reader is allowed to fetch. This
+ * is a security boundary: the /api/article route refuses any URL outside this
+ * list so it can't be used to fetch arbitrary internal/external resources (SSRF).
+ * Keep in sync with the publishers in {@link NEWS_FEEDS}.
+ */
+export const ALLOWED_ARTICLE_HOSTS = [
+  "aljazeera.com",
+  "theguardian.com",
+  "cnbc.com",
+  "sciencedaily.com",
+  "theverge.com",
+  "nasa.gov",
+];
+
+/** True when `url` is an http(s) page on an allowed publisher host. */
+export function isAllowedArticleUrl(url: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
+  const host = parsed.hostname.toLowerCase();
+  return ALLOWED_ARTICLE_HOSTS.some(
+    (allowed) => host === allowed || host.endsWith(`.${allowed}`),
+  );
+}

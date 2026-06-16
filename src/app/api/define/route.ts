@@ -37,25 +37,30 @@ export async function POST(req: Request) {
     : "claude";
   const byok = typeof body.apiKey === "string" ? body.apiKey.trim() : "";
   const preferAi = body.preferAi === true;
+  // The free dictionary only knows single headwords; idioms/phrases need AI.
+  const isPhrase = /\s/.test(word);
 
   try {
-    // Honor an explicit "richer card" request when a key is available.
-    if (preferAi) {
+    // Honor an explicit "richer card" request, and always use AI for phrases.
+    if (preferAi || isPhrase) {
       const ai = await tryAi(provider, byok, word);
       if (ai) return NextResponse.json({ word: ai, source: "ai" });
     }
 
-    const fromDict = await lookupWord(word);
-    if (fromDict) return NextResponse.json({ word: fromDict, source: "dictionary" });
+    if (!isPhrase) {
+      const fromDict = await lookupWord(word);
+      if (fromDict) return NextResponse.json({ word: fromDict, source: "dictionary" });
 
-    // Not in the dictionary — fall back to AI if we can.
-    const ai = await tryAi(provider, byok, word);
-    if (ai) return NextResponse.json({ word: ai, source: "ai" });
+      // Not in the dictionary — fall back to AI if we can.
+      const ai = await tryAi(provider, byok, word);
+      if (ai) return NextResponse.json({ word: ai, source: "ai" });
+    }
 
     return NextResponse.json(
       {
-        error:
-          "No definition found for that word. Try selecting a single dictionary word.",
+        error: isPhrase
+          ? "Idioms and phrases need AI. Add your API key in Settings to look them up."
+          : "No definition found for that word. Try selecting a single dictionary word.",
       },
       { status: 404 },
     );

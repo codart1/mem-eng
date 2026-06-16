@@ -70,6 +70,25 @@ function atomLink(block: string): string | undefined {
   return fallback;
 }
 
+/** Pull a thumbnail URL from common feed image extensions, if present. */
+function itemImage(block: string): string | undefined {
+  // <media:thumbnail url="…"> or <media:content … url="…" medium="image">
+  const media = block.match(
+    /<media:(?:thumbnail|content)\b[^>]*\burl\s*=\s*["']([^"']+)["'][^>]*>/i,
+  );
+  if (media?.[1]) return decodeEntities(media[1].trim());
+  // <enclosure url="…" type="image/…">
+  const enclosures = [...block.matchAll(/<enclosure\b([^>]*)>/gi)];
+  for (const [, attrs] of enclosures) {
+    const type = attrs.match(/type\s*=\s*["']([^"']+)["']/i)?.[1] ?? "";
+    const url = attrs.match(/url\s*=\s*["']([^"']+)["']/i)?.[1];
+    if (url && (type.startsWith("image/") || /\.(jpe?g|png|webp|gif)/i.test(url))) {
+      return decodeEntities(url.trim());
+    }
+  }
+  return undefined;
+}
+
 function parseDate(value: string | undefined): number | undefined {
   if (!value) return undefined;
   const t = Date.parse(value.trim());
@@ -120,6 +139,7 @@ export function parseFeed(xml: string, ctx: ParseContext): NewsArticle[] {
       source: ctx.source,
       category: ctx.category,
       publishedAt,
+      image: itemImage(block),
     });
   }
 

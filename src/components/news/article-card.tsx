@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
-import { ExternalLink, Sparkles, Loader2, Wand2 } from "lucide-react";
+import { ExternalLink, Sparkles, Loader2, Wand2, BookOpenText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,9 +22,24 @@ export function ArticleCard({ article, onWord, savedWords }: Props) {
   const summarize = useSummarizeArticle();
 
   const simplified = summarize.data;
+  const readHref = `/news/read?u=${encodeURIComponent(article.link)}`;
 
   return (
     <Card className="overflow-hidden">
+      {article.image && (
+        // Cancel the Card's top padding so the cover sits flush with the top
+        // edge (the Card only auto-removes it for a *direct* <img> child).
+        <Link href={readHref} className="-mt-(--card-spacing) block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={article.image}
+            alt=""
+            referrerPolicy="no-referrer"
+            loading="lazy"
+            className="aspect-[16/7] w-full object-cover"
+          />
+        </Link>
+      )}
       <CardContent className="space-y-3 py-5">
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
           <Badge variant="secondary" className="font-medium">
@@ -89,7 +105,10 @@ export function ArticleCard({ article, onWord, savedWords }: Props) {
           </div>
         )}
 
-        <div className="flex items-center justify-between gap-3 pt-1">
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <Button size="sm" render={<Link href={readHref} />}>
+            <BookOpenText className="size-4" /> {t.news.readArticle}
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -110,9 +129,9 @@ export function ArticleCard({ article, onWord, savedWords }: Props) {
             href={article.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs font-medium transition-colors"
+            className="text-muted-foreground hover:text-foreground ml-auto inline-flex items-center gap-1 text-xs font-medium transition-colors"
           >
-            {t.news.readFull} <ExternalLink className="size-3.5" />
+            {t.news.openOriginal} <ExternalLink className="size-3.5" />
           </a>
         </div>
       </CardContent>
