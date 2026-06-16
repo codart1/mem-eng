@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,12 @@ export function ArticleReader({ url }: { url: string }) {
   const { data, isLoading, isError, error } = useArticle(url);
   const decks = useDecks();
   const cards = useAllCards();
+
+  useEffect(() => {
+    if (isError && error) {
+      console.error("[ArticleReader] Error loading article:", error);
+    }
+  }, [isError, error]);
 
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [deckId, setDeckId] = useState("");

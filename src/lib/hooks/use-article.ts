@@ -13,12 +13,23 @@ export function useArticle(url: string | undefined) {
     queryKey: ["article", url],
     enabled: !!url,
     queryFn: async () => {
-      const res = await fetch(`/api/article?url=${encodeURIComponent(url!)}`);
-      const data = (await res.json().catch(() => ({}))) as ArticleContent & {
-        error?: string;
-      };
-      if (!res.ok) throw new Error(data.error ?? "Failed to load the article.");
-      return data;
+      try {
+        const res = await fetch(`/api/article?url=${encodeURIComponent(url!)}`);
+        const data = (await res.json().catch((err) => {
+          console.error("[useArticle] Failed to parse JSON response:", err);
+          return {};
+        })) as ArticleContent & {
+          error?: string;
+        };
+        if (!res.ok) {
+          const errMsg = data.error ?? `Failed to load the article. (HTTP status: ${res.status})`;
+          throw new Error(errMsg);
+        }
+        return data;
+      } catch (err) {
+        console.error("[useArticle] Error fetching article:", err);
+        throw err;
+      }
     },
     staleTime: 1000 * 60 * 60,
   });
