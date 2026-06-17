@@ -87,6 +87,16 @@ export interface AppSettings {
 export const AI_PROVIDERS = ["claude", "openai"] as const;
 export type AiProvider = (typeof AI_PROVIDERS)[number];
 
+/**
+ * A fixed, in-the-past timestamp used as the last-write-wins clock for
+ * auto-generated baseline data (the seeded starter deck/cards and freshly
+ * created default settings). Because it's identical on every device and older
+ * than any real user action, the same baseline records dedupe cleanly on sync,
+ * and any genuine edit/delete (stamped with `now()`) always wins over them.
+ * 2020-01-01T00:00:00Z.
+ */
+export const SEED_BASELINE_TS = 1577836800000;
+
 export const DEFAULT_SETTINGS: Omit<AppSettings, "updatedAt"> = {
   id: "app",
   requestRetention: 0.9,

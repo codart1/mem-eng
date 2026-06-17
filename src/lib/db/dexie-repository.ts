@@ -22,6 +22,7 @@ import {
   type Book,
   type Bookmark,
   DEFAULT_SETTINGS,
+  SEED_BASELINE_TS,
 } from "@/lib/types";
 import { uid, now } from "@/lib/utils";
 
@@ -252,7 +253,10 @@ const settingsRepo: SettingsRepository = {
   async get() {
     const existing = await db.settings.get("app");
     if (existing) return existing;
-    const fresh: AppSettings = { ...DEFAULT_SETTINGS, updatedAt: now() };
+    // Auto-created defaults carry the baseline clock so that, on sync, a user's
+    // real saved settings (stamped with now()) always win over another device's
+    // freshly-defaulted row instead of being clobbered by it.
+    const fresh: AppSettings = { ...DEFAULT_SETTINGS, updatedAt: SEED_BASELINE_TS };
     await db.settings.put(fresh);
     return fresh;
   },

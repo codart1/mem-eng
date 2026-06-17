@@ -58,4 +58,18 @@ describe("selectLocalToPush (high-water mark, push side)", () => {
   it("pushes everything on a first sync (mark = 0)", () => {
     expect(selectLocalToPush(local, 0).map((r) => r.id)).toEqual(["a", "b", "c"]);
   });
+
+  it("excludes ids just applied from the server (anti-clobber)", () => {
+    // 'b' was pulled (server had a newer copy) — we must not push our older copy back.
+    const applied = new Set(["b"]);
+    expect(selectLocalToPush(local, 0, applied).map((r) => r.id)).toEqual([
+      "a",
+      "c",
+    ]);
+  });
+
+  it("still respects the high-water mark alongside the applied-id exclusion", () => {
+    const applied = new Set(["c"]);
+    expect(selectLocalToPush(local, 150, applied).map((r) => r.id)).toEqual(["b"]);
+  });
 });

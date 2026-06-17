@@ -37,12 +37,21 @@ export function selectRemoteToApply<R extends { id: string; updated_at: number }
   });
 }
 
-/** Local rows changed since the last push (their clock beats the high-water mark). */
-export function selectLocalToPush<L extends { updatedAt: number }>(
+/**
+ * Local rows to upload: those changed since the last push (clock beats the
+ * high-water mark) and NOT among the ids we just applied from the server in this
+ * same pass. Excluding the just-pulled ids is what prevents an older local copy
+ * from clobbering a newer cloud copy — we never push back a row the server just
+ * told us was newer.
+ */
+export function selectLocalToPush<L extends { id: string; updatedAt: number }>(
   local: L[],
   pushedThrough: number,
+  appliedIds: ReadonlySet<string> = new Set(),
 ): L[] {
-  return local.filter((row) => row.updatedAt > pushedThrough);
+  return local.filter(
+    (row) => row.updatedAt > pushedThrough && !appliedIds.has(row.id),
+  );
 }
 
 // ---- Collections ------------------------------------------------------------
@@ -145,28 +154,9 @@ async function syncCollection(
     normalized.map((n) => [n.id, { updatedAt: n.updatedAt }]),
   );
 
-  // PUSH first, so rows we pull in this same run aren't immediately re-pushed.
-  const toPush = selectLocalToPush(normalized, state.pushedThrough);
-  let maxPushed = state.pushedThrough;
-  if (toPush.length > 0) {
-    const payload = toPush.map((n) => {
-      maxPushed = Math.max(maxPushed, n.updatedAt);
-      return {
-        user_id: userId,
-        collection: col.name,
-        id: n.id,
-        data: n.row,
-        updated_at: n.updatedAt,
-        deleted_at: n.deletedAt,
-      };
-    });
-    const { error } = await supabase
-      .from(TABLE)
-      .upsert(payload, { onConflict: "user_id,collection,id" });
-    if (error) throw new Error(`Push (${col.name}) failed: ${error.message}`);
-  }
-
-  // PULL everything changed since we last pulled.
+  // PULL first, so a stale local copy can't clobber a newer cloud copy: we learn
+  // which records the server holds a newer version of, then exclude those from
+  // the push below.
   const { data, error } = await supabase
     .from(TABLE)
     .select("id,data,updated_at,deleted_at")
@@ -181,10 +171,33 @@ async function syncCollection(
 
   const winners = selectRemoteToApply(remote, localById);
   if (winners.length > 0) {
-    // The pushed `data` already contains the row's own clock/delete fields, so
+    // The stored `data` already contains the row's own clock/delete fields, so
     // we just revive Date fields and write it back verbatim.
     const revived = winners.map((r) => col.revive(r.data));
     await col.write(revived);
+  }
+  const appliedIds = new Set(winners.map((r) => r.id));
+
+  // PUSH local changes — excluding the ids we just applied from the server
+  // (they're now identical to the cloud, and were genuinely newer there).
+  const toPush = selectLocalToPush(normalized, state.pushedThrough, appliedIds);
+  let maxPushed = state.pushedThrough;
+  if (toPush.length > 0) {
+    const payload = toPush.map((n) => {
+      maxPushed = Math.max(maxPushed, n.updatedAt);
+      return {
+        user_id: userId,
+        collection: col.name,
+        id: n.id,
+        data: n.row,
+        updated_at: n.updatedAt,
+        deleted_at: n.deletedAt,
+      };
+    });
+    const { error: pushError } = await supabase
+      .from(TABLE)
+      .upsert(payload, { onConflict: "user_id,collection,id" });
+    if (pushError) throw new Error(`Push (${col.name}) failed: ${pushError.message}`);
   }
 
   return { pulled: winners.length, pushed: toPush.length, maxPulled, maxPushed };

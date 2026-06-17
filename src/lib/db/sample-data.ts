@@ -1,7 +1,19 @@
+import { createEmptyCard } from "ts-fsrs";
+import { db } from "./schema";
 import { repository } from "./dexie-repository";
 import type { NewCardInput } from "./repository";
+import { SEED_BASELINE_TS, type Deck, type VocabCard } from "@/lib/types";
 
 type SampleWord = Omit<NewCardInput, "deckId">;
+
+/**
+ * Stable, deterministic ids for the seeded starter content. Because every fresh
+ * device generates the *same* ids (and the same {@link SEED_BASELINE_TS} clock),
+ * the starter deck/cards dedupe on sync instead of multiplying — two devices
+ * that both seed end up with one starter deck, not two.
+ */
+const SEED_DECK_ID = "seed-starter-everyday-english";
+const seedCardId = (word: string) => `seed-card-${word}`;
 
 export const SAMPLE_WORDS: SampleWord[] = [
   {
@@ -98,21 +110,55 @@ export const SAMPLE_WORDS: SampleWord[] = [
   },
 ];
 
-/** Seed a starter deck on first run (idempotent). Browser-only. */
+/**
+ * Seed a starter deck on first run (idempotent). Browser-only.
+ *
+ * The deck and cards are written with deterministic ids and the fixed
+ * {@link SEED_BASELINE_TS} clock (rather than the repository's random uid() +
+ * now()), so that when two devices both seed and then sync the same account,
+ * the starter content reconciles to a single copy instead of duplicating.
+ */
 export async function ensureSeeded(): Promise<void> {
   if (typeof window === "undefined") return;
   await repository.settings.get(); // ensure the settings row exists
   if (localStorage.getItem("lexio.seeded") === "1") return;
   const decks = await repository.decks.list();
   if (decks.length === 0) {
-    const deck = await repository.decks.create({
+    const deck: Deck = {
+      id: SEED_DECK_ID,
       name: "Starter — Everyday English",
       description: "A handful of useful words to try things out.",
       color: "teal",
+      createdAt: SEED_BASELINE_TS,
+      updatedAt: SEED_BASELINE_TS,
+      deletedAt: null,
+    };
+    const cards: VocabCard[] = SAMPLE_WORDS.map((w) => ({
+      id: seedCardId(w.word),
+      deckId: SEED_DECK_ID,
+      word: w.word,
+      phonetic: w.phonetic,
+      partOfSpeech: w.partOfSpeech,
+      definition: w.definition,
+      examples: w.examples ?? [],
+      synonyms: w.synonyms ?? [],
+      antonyms: w.antonyms ?? [],
+      senses: w.senses,
+      cefr: w.cefr,
+      mnemonic: w.mnemonic,
+      translation: w.translation,
+      notes: w.notes,
+      tags: w.tags ?? [],
+      fsrs: createEmptyCard(new Date(SEED_BASELINE_TS)),
+      source: w.source ?? "manual",
+      createdAt: SEED_BASELINE_TS,
+      updatedAt: SEED_BASELINE_TS,
+      deletedAt: null,
+    }));
+    await db.transaction("rw", db.decks, db.cards, async () => {
+      await db.decks.add(deck);
+      await db.cards.bulkAdd(cards);
     });
-    await repository.cards.createMany(
-      SAMPLE_WORDS.map((w) => ({ ...w, deckId: deck.id })),
-    );
   }
   localStorage.setItem("lexio.seeded", "1");
 }
