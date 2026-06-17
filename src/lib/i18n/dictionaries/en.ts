@@ -630,6 +630,21 @@ export const en = {
       error: "Sync failed. We'll try again shortly.",
       offline: "You're offline — changes will sync when you reconnect.",
     },
+
+    credits: {
+      title: "AI credits",
+      description:
+        "Credits power AI when you haven't added your own API key. New accounts get 25 free.",
+      balance: "Balance",
+      count: "{count} credits",
+      buy: "Buy credits",
+      pack: "{credits} credits",
+      opening: "Opening checkout…",
+      unavailable: "Buying credits isn't set up yet.",
+      failed: "Couldn't start checkout. Please try again.",
+      purchaseSuccess: "Thanks! Your credits will appear in a moment.",
+      lowNote: "Out of credits? Add your own API key in AI settings to keep using AI for free.",
+    },
   },
 
   generate: {

@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth/auth-provider";
 import { SyncProvider } from "@/lib/sync/sync-provider";
+import { CreditsProvider } from "@/lib/credits/credits-provider";
 import { ensureSeeded } from "@/lib/db/sample-data";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -34,7 +35,9 @@ export function Providers({ children }: { children: ReactNode }) {
         <I18nProvider>
           <AuthProvider>
             <SyncProvider>
-              <TooltipProvider delay={200}>{children}</TooltipProvider>
+              <CreditsProvider>
+                <TooltipProvider delay={200}>{children}</TooltipProvider>
+              </CreditsProvider>
             </SyncProvider>
           </AuthProvider>
         </I18nProvider>

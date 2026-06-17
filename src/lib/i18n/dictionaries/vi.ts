@@ -629,6 +629,21 @@ export const vi: Dictionary = {
       error: "Đồng bộ thất bại. Sẽ thử lại sau.",
       offline: "Bạn đang ngoại tuyến — thay đổi sẽ đồng bộ khi kết nối lại.",
     },
+
+    credits: {
+      title: "Tín dụng AI",
+      description:
+        "Tín dụng dùng để chạy AI khi bạn chưa thêm API key riêng. Tài khoản mới được tặng 25.",
+      balance: "Số dư",
+      count: "{count} tín dụng",
+      buy: "Mua tín dụng",
+      pack: "{credits} tín dụng",
+      opening: "Đang mở trang thanh toán…",
+      unavailable: "Tính năng mua tín dụng chưa được thiết lập.",
+      failed: "Không mở được trang thanh toán. Vui lòng thử lại.",
+      purchaseSuccess: "Cảm ơn bạn! Tín dụng sẽ xuất hiện trong giây lát.",
+      lowNote: "Hết tín dụng? Thêm API key riêng trong cài đặt AI để tiếp tục dùng AI miễn phí.",
+    },
   },
 
   generate: {

@@ -23,19 +23,20 @@ export class GenerateError extends Error {
 }
 
 /**
- * Generate a rich vocabulary card for `word` with the chosen provider.
- * `byok` is the user's bring-your-own key (preferred); falls back to the
- * server env key. Throws {@link GenerateError} with a user-facing message.
+ * Generate a rich vocabulary card for `word` with the chosen provider, using the
+ * already-resolved `apiKey` (BYOK or, after a credit is spent, the server key —
+ * see {@link import("./access").authorizeAi}). Throws {@link GenerateError} with
+ * a user-facing message.
  */
 export async function generateWord(
   provider: AiProvider,
-  byok: string,
+  apiKey: string,
   word: string,
 ): Promise<GeneratedWord> {
   const raw =
     provider === "openai"
-      ? await generateWithOpenAI(byok, word)
-      : await generateWithClaude(byok, word);
+      ? await generateWithOpenAI(apiKey, word)
+      : await generateWithClaude(apiKey, word);
 
   const parsed = generatedWordSchema.safeParse(JSON.parse(raw));
   if (!parsed.success) {
@@ -45,15 +46,7 @@ export async function generateWord(
 }
 
 /** Returns the raw JSON text from Claude, or throws a GenerateError. */
-async function generateWithClaude(byok: string, word: string): Promise<string> {
-  const apiKey = byok || process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new GenerateError(
-      "AI is not configured. Add your Anthropic API key in Settings, or set ANTHROPIC_API_KEY on the server.",
-      501,
-    );
-  }
-
+async function generateWithClaude(apiKey: string, word: string): Promise<string> {
   const client = new Anthropic({ apiKey });
   try {
     const message = await client.messages.create({
@@ -79,15 +72,7 @@ async function generateWithClaude(byok: string, word: string): Promise<string> {
 }
 
 /** Returns the raw JSON text from OpenAI, or throws a GenerateError. */
-async function generateWithOpenAI(byok: string, word: string): Promise<string> {
-  const apiKey = byok || process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new GenerateError(
-      "AI is not configured. Add your OpenAI API key in Settings, or set OPENAI_API_KEY on the server.",
-      501,
-    );
-  }
-
+async function generateWithOpenAI(apiKey: string, word: string): Promise<string> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {

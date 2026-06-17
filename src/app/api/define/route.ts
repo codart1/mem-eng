@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { lookupWord } from "@/lib/dictionary/lookup";
 import { generateWord, GenerateError } from "@/lib/ai/generate";
+import { authorizeAi, refundAiCredit } from "@/lib/ai/access";
 import { AI_PROVIDERS, type AiProvider } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -59,8 +60,8 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error: isPhrase
-          ? "Idioms and phrases need AI. Add your API key in Settings to look them up."
-          : "No definition found for that word. Try selecting a single dictionary word.",
+          ? "Idioms and phrases need AI. Sign in and use credits, or add your API key in Settings."
+          : "No definition found. Sign in and use credits, or add your API key for AI lookups.",
       },
       { status: 404 },
     );
@@ -76,13 +77,26 @@ export async function POST(req: Request) {
   }
 }
 
-/** Attempt AI generation, swallowing the "no key configured" case. */
+/**
+ * Attempt AI generation. Returns null when AI simply isn't available to this
+ * caller (no key configured, not signed in, or out of credits) so the dictionary
+ * flow can show its tailored message. A credit is spent only on a real attempt,
+ * and refunded if the provider then fails.
+ */
 async function tryAi(provider: AiProvider, byok: string, word: string) {
+  let access;
   try {
-    return await generateWord(provider, byok, word);
+    access = await authorizeAi(provider, byok);
   } catch (err) {
-    // 501 = AI simply isn't configured; that's an expected no-op here.
-    if (err instanceof GenerateError && err.status === 501) return null;
+    if (err instanceof GenerateError && [401, 402, 501].includes(err.status)) {
+      return null;
+    }
+    throw err;
+  }
+  try {
+    return await generateWord(provider, access.apiKey, word);
+  } catch (err) {
+    if (access.charged) await refundAiCredit();
     throw err;
   }
 }

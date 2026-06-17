@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "db:login": "supabase login",
     "db:link": "supabase link --project-ref bubdaivjqzjjkulyuwbu",
-    "db:push": "supabase db push"
+    "db:push": "supabase db push",
+    "ls:setup": "node --env-file=.env.local scripts/lemonsqueezy-setup.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

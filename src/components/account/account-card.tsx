@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useSync } from "@/lib/sync/sync-provider";
 import { useI18n } from "@/lib/i18n";
+import { CreditsSection } from "./credits-section";
 
 export function AccountCard() {
   const { configured, loading, user, signOut } = useAuth();
@@ -103,6 +104,11 @@ export function AccountCard() {
                 </Button>
               </div>
             </div>
+
+            <Separator />
+
+            {/* AI credits */}
+            <CreditsSection />
           </>
         ) : (
           <>

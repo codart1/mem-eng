@@ -44,18 +44,21 @@ const norm = (s: ArticleSummary): ArticleSummary => ({
   ).slice(0, 5),
 });
 
-/** Produce a learner-friendly summary + vocabulary for an article. */
+/**
+ * Produce a learner-friendly summary + vocabulary for an article, using the
+ * already-resolved `apiKey` (BYOK or the server key after a credit is spent).
+ */
 export async function summarizeArticle(
   provider: AiProvider,
-  byok: string,
+  apiKey: string,
   title: string,
   summary: string,
 ): Promise<ArticleSummary> {
   const user = `Headline: ${title}\n\nSummary: ${summary}`;
   const raw =
     provider === "openai"
-      ? await withOpenAI(byok, user)
-      : await withClaude(byok, user);
+      ? await withOpenAI(apiKey, user)
+      : await withClaude(apiKey, user);
 
   const parsed = summarySchema.safeParse(JSON.parse(raw));
   if (!parsed.success) {
@@ -64,14 +67,7 @@ export async function summarizeArticle(
   return norm(parsed.data);
 }
 
-async function withClaude(byok: string, user: string): Promise<string> {
-  const apiKey = byok || process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new GenerateError(
-      "AI is not configured. Add your Anthropic API key in Settings, or set ANTHROPIC_API_KEY on the server.",
-      501,
-    );
-  }
+async function withClaude(apiKey: string, user: string): Promise<string> {
   const client = new Anthropic({ apiKey });
   try {
     const message = await client.messages.create({
@@ -96,14 +92,7 @@ async function withClaude(byok: string, user: string): Promise<string> {
   }
 }
 
-async function withOpenAI(byok: string, user: string): Promise<string> {
-  const apiKey = byok || process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new GenerateError(
-      "AI is not configured. Add your OpenAI API key in Settings, or set OPENAI_API_KEY on the server.",
-      501,
-    );
-  }
+async function withOpenAI(apiKey: string, user: string): Promise<string> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {

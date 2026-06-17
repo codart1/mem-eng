@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateWord, GenerateError } from "@/lib/ai/generate";
+import { authorizeAi, refundAiCredit, type AiAccess } from "@/lib/ai/access";
 import { AI_PROVIDERS, type AiProvider } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -24,13 +25,16 @@ export async function POST(req: Request) {
     ? (body.provider as AiProvider)
     : "claude";
 
-  // BYOK takes precedence; fall back to the matching server key. Never logged.
+  // BYOK is used directly; otherwise a credit is spent on the server key. Never logged.
   const byok = typeof body.apiKey === "string" ? body.apiKey.trim() : "";
 
+  let access: AiAccess | null = null;
   try {
-    const word_ = await generateWord(provider, byok, word);
+    access = await authorizeAi(provider, byok);
+    const word_ = await generateWord(provider, access.apiKey, word);
     return NextResponse.json({ word: word_ });
   } catch (err) {
+    if (access?.charged) await refundAiCredit(); // provider failed after we charged
     if (err instanceof GenerateError) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }

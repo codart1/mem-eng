@@ -101,10 +101,13 @@ const norm = (r: z.infer<typeof chatResponseSchema>): ChatResult => ({
     .filter((s) => s.title && s.words.length > 0),
 });
 
-/** Answer a chat turn, grounded in the learner's data snapshot. */
+/**
+ * Answer a chat turn, grounded in the learner's data snapshot, using the
+ * already-resolved `apiKey` (BYOK or the server key after a credit is spent).
+ */
 export async function chatReply(
   provider: AiProvider,
-  byok: string,
+  apiKey: string,
   snapshot: string,
   messages: ChatMessage[],
 ): Promise<ChatResult> {
@@ -115,8 +118,8 @@ export async function chatReply(
 
   const raw =
     provider === "openai"
-      ? await withOpenAI(byok, snapshot, history)
-      : await withClaude(byok, snapshot, history);
+      ? await withOpenAI(apiKey, snapshot, history)
+      : await withClaude(apiKey, snapshot, history);
 
   const parsed = chatResponseSchema.safeParse(JSON.parse(raw));
   if (!parsed.success) {
@@ -126,17 +129,10 @@ export async function chatReply(
 }
 
 async function withClaude(
-  byok: string,
+  apiKey: string,
   snapshot: string,
   history: ChatMessage[],
 ): Promise<string> {
-  const apiKey = byok || process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new GenerateError(
-      "AI is not configured. Add your Anthropic API key in Settings, or set ANTHROPIC_API_KEY on the server.",
-      501,
-    );
-  }
   const client = new Anthropic({ apiKey });
   try {
     const message = await client.messages.create({
@@ -164,17 +160,10 @@ async function withClaude(
 }
 
 async function withOpenAI(
-  byok: string,
+  apiKey: string,
   snapshot: string,
   history: ChatMessage[],
 ): Promise<string> {
-  const apiKey = byok || process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new GenerateError(
-      "AI is not configured. Add your OpenAI API key in Settings, or set OPENAI_API_KEY on the server.",
-      501,
-    );
-  }
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {

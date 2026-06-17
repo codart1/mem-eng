@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { chatReply, MAX_HISTORY, type ChatMessage } from "@/lib/ai/chat";
 import { GenerateError } from "@/lib/ai/generate";
+import { authorizeAi, refundAiCredit, type AiAccess } from "@/lib/ai/access";
 import { AI_PROVIDERS, type AiProvider } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -51,10 +52,13 @@ export async function POST(req: Request) {
     : "claude";
   const byok = typeof body.apiKey === "string" ? body.apiKey.trim() : "";
 
+  let access: AiAccess | null = null;
   try {
-    const result = await chatReply(provider, byok, snapshot, messages);
+    access = await authorizeAi(provider, byok);
+    const result = await chatReply(provider, access.apiKey, snapshot, messages);
     return NextResponse.json(result);
   } catch (err) {
+    if (access?.charged) await refundAiCredit();
     if (err instanceof GenerateError) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
